@@ -1,0 +1,27 @@
+# --- 编译输出文件 ---
+*.o
+*.obj
+*.lib
+*.a
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+
+# --- 常见的 IDE/编译器 输出目录 ---
+build/
+output/
+Debug/
+Release/
+
+# --- 编辑器/IDE 私有文件 ---
+.vscode/
+.idea/
+*.swp
+*.bak
+*~
+
+# --- 操作系统临时文件 ---
+Thumbs.db
+.DS_Store
