@@ -1,5 +1,5 @@
 /**
- * @file MicroCom_conf.h
+ * @file MicroCom_Canfd.h
  * @author https://xfp23.github.io/
  * @brief 
  * @version 0.1
@@ -8,18 +8,16 @@
  * @copyright Copyright (c) 2026
  * 
  */
-#ifndef MICROCOM_CONF_H
-#define MICROCOM_CONF_H
+#ifndef MICROCOM_CANFD_H
+#define MICROCOM_CANFD_H
+
+#include "MicroCom_types.h"
 
 #ifdef __cplusplus
-extern "C"{
+extern "C"
+{
 #endif
 
-#define MICROCOM_VERSION "0.0.1"
-
-#define MICROCOM_FREQ_HZ 1000U
-
-#define MICROCOM_CAN_MESSAGE_SIZE 32
 
 #ifdef __cplusplus
 }
