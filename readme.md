@@ -1,6 +1,6 @@
 # Communication Scheduling Component (CAN / LIN)
 
-[中文文档](./README.zh.md)
+[中文文档](./readme.zh.md)
 
 MicroCom is a bus-message scheduling component for embedded MCUs (primarily
 targeting Cortex-M4). It handles periodic message transmission, receive

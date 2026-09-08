@@ -1,6 +1,6 @@
 # 通信调度管理组件 (CAN / LIN)
 
-[English](./README.md)
+[English](./readme.md)
 
 MicroCom 是一个面向嵌入式 MCU（以 Cortex-M4 为主要目标）的总线报文调度组件，
 负责周期报文的定时发送、接收超时监控、事件报文的按需触发，以及诊断会话期间
