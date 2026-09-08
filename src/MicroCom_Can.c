@@ -1,25 +1,12 @@
 /**
  * @file MicroCom_Can.c
- * @brief MicroCom CAN 报文调度模块实现
- *
- * 重构要点（相对旧版本）：
- *  1. TX / RX 拆分为四张独立的表（CycleTx/CycleRx/EventTx/EventRx），
- *     彻底去掉 [dir][channel] 的二维下标写法，消除了整整一类
- *     "dir 和 channel 写反/写死" 的 bug。
- *  2. trigger 计数存在跨中断/任务上下文的读改写（Trigger_EventMsg 里 ++，
- *     TimerHandler 里 --），用 MICROCOM_ENTER/EXIT_CRITICAL 保护，
- *     不再是数据竞争。
- *  3. Start() 时统一把所有已注册报文的时间基准对齐到当前 tick，
- *     避免 Init()~Start() 之间的空档被计入周期/超时判断。
- *  4. RxIndication 两个分支（周期/事件）现在都做 len <= dlc 校验，
- *     不会再越界 memcpy；且只处理 is_run == true 的报文，
- *     被 DisableNonDiagnosticCom 关闭的报文不会再被悄悄"复活"。
- *  5. MicroCom_Can_Transmit 的 mbox 参数改为 uint16_t，
- *     与 mbox_id 字段类型一致，消除隐式截断。
- *  6. Trigger_EventMsg / SetEventBusOff / ClearEventBusOff 都要求
- *     调用者显式指定 channel，避免跨通道同 ID 时的二义性。
- *
+ * @author https://xfp23.github.io/
+ * @brief Implementation of MicroCom's CAN module
+ * @version 0.1
+ * @date 2026-09-08
+ * 
  * @copyright Copyright (c) 2026
+ * 
  */
 #include "MicroCom_Can.h"
 #include "MicroCom_utils.h"
@@ -487,7 +474,7 @@ MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel)
     return MICROCOM_STATUS_OK;
 }
 
-MicroCom_Status_t /*__attribute__((weak))*/ MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox,
+MicroCom_Status_t __attribute__((weak)) MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox,
                                                                   uint8_t dlc, const uint8_t *data, bool is_extend)
 {
     (void)channel;

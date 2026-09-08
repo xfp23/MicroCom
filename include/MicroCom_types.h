@@ -153,7 +153,7 @@ typedef struct
     MicroCom_CanEventTxMsg_t EventTx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_SIZE];
     MicroCom_CanEventRxMsg_t EventRx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_SIZE];
 
-    volatile uint32_t tick;   /* 单条 32bit 对齐读写在 Cortex-M4 上是原子的 */
+    volatile uint32_t tick;
     volatile bool     enable;
 } MicroCOM_CAN_Obj_t;
 
