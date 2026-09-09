@@ -18,7 +18,7 @@ extern "C"
 
 * @brief MicroCom version string.
   */
-  #define MICROCOM_VERSION    "0.0.1"
+  #define MICROCOM_VERSION    "0.0.3"
 
 /* ------------------------------------------------------------------------ */
 /* Capacity Configuration                                                   */
@@ -38,7 +38,7 @@ extern "C"
 *
 * The TX and RX message tables each have this number of independent slots.
   */
-  #define MICROCOM_CAN_CYCLEMSG_SIZE    (16u)
+  #define MICROCOM_CAN_CYCLEMSG_SIZE    (8u)
 
 /**
 
@@ -46,7 +46,7 @@ extern "C"
 *
 * The TX and RX message tables each have this number of independent slots.
   */
-  #define MICROCOM_CAN_EVENTMSG_SIZE    (16u)
+  #define MICROCOM_CAN_EVENTMSG_SIZE    (8u)
 
 /**
 

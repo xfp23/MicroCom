@@ -581,7 +581,7 @@ MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel)
     return MICROCOM_STATUS_OK;
 }
 
-MicroCom_Status_t /*__attribute__((weak))*/ MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox, uint8_t dlc, const uint8_t *data, bool is_extend)
+MicroCom_Status_t __attribute__((weak)) MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox, uint8_t dlc, const uint8_t *data, bool is_extend)
 {
     (void)channel;
     (void)can_id;
