@@ -32,6 +32,7 @@ typedef enum
     MICROCOM_PARAM_INVALID,  /* 参数非法 */
     MICROCOM_CHANNEL_ERR,
     MICROCOM_NOT_FIND,
+    MICROCOM_CHANNEL_OVERFLOW, // 通道溢出
 } MicroCom_Status_t;
 
 typedef enum
@@ -78,6 +79,8 @@ typedef struct
     /* --- 运行时字段：内部维护，注册时会被强制初始化，用户无需填写 --- */
     volatile bool     is_run;    /* 是否参与调度 */
     volatile uint32_t next_time; /* 下一次应发送的 tick（内部用，避免周期漂移） */
+
+    bool is_valid;           // 有效
 } MicroCom_CanCycleTxMsg_t;
 
 /* ------------------------------------------------------------------------ */
@@ -98,8 +101,11 @@ typedef struct
     MicroCom_Func_t func;    /* 收到报文 / 超时 均会回调，通过 ctx.event 区分 */
 
     volatile bool     is_run;
-    volatile bool     busoff;      /* true 表示超时 / 总线错误 */
+    // volatile bool     busoff;      /* true 表示超时 / 总线错误 */
+    volatile bool     is_offline; // 离线超时
     volatile uint32_t last_rx_time;/* 最近一次收到报文（或重置）时的 tick */
+
+    bool is_valid;           // 有效
 } MicroCom_CanCycleRxMsg_t;
 
 /* ------------------------------------------------------------------------ */
@@ -121,6 +127,7 @@ typedef struct
     volatile bool     is_run;
     volatile uint16_t trigger; /* 待发送次数；Trigger 接口 ++，TimerHandler --。
                                    跨上下文读改写，访问时须加临界区保护 */
+    bool is_valid;           // 有效
 } MicroCom_CanEventTxMsg_t;
 
 /* ------------------------------------------------------------------------ */
@@ -140,7 +147,9 @@ typedef struct
     MicroCom_Func_t func;
 
     volatile bool is_run;
-    volatile bool busoff;   /* 事件报文无自动超时机制，由 Set/ClearEventBusOff 管理 */
+    volatile bool is_offline;   /* 事件报文无自动超时机制，由 Set/ClearEventBusOff 管理 */
+
+    bool is_valid;           // 有效
 } MicroCom_CanEventRxMsg_t;
 
 /* ------------------------------------------------------------------------ */

@@ -160,7 +160,7 @@ MicroCom_Status_t MicroCom_Can_Trigger_EventMsg(uint32_t id, uint8_t channel);
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_SetEventBusOff(uint32_t id, uint8_t channel);
+MicroCom_Status_t MicroCom_Can_SetEventOffline(uint32_t id, uint8_t channel);
 
 /**
 
@@ -171,7 +171,7 @@ MicroCom_Status_t MicroCom_Can_SetEventBusOff(uint32_t id, uint8_t channel);
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_ClearEventBusOff(uint32_t id, uint8_t channel);
+MicroCom_Status_t MicroCom_Can_ClearEventOffline(uint32_t id, uint8_t channel);
 
 /* ------------------------------------------------------------------------ */
 /* Diagnostic Session Control                                               */

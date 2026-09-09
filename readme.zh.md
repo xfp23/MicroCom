@@ -112,7 +112,7 @@ MicroCom_Can_RxIndication()  -> 由 CAN 接收中断/任务调用，喂入收到
 | `MicroCom_Can_TimerHandler(void)`                  | 周期调度处理（TX 发送 / RX 超时 / 事件消耗）                                   |
 | `MicroCom_Can_RxIndication(channel, id, data, len)` | 喂入一帧接收报文                                                             |
 | `MicroCom_Can_Trigger_EventMsg(id, channel)`       | 触发一次事件发送报文                                                          |
-| `MicroCom_Can_SetEventBusOff(id, channel)`         | 置位事件接收报文的 busoff                                                     |
+| `MicroCom_Can_SetEventOffline(id, channel)`         | 置位事件接收报文的 busoff                                                     |
 | `MicroCom_Can_ClearEventBusOff(id, channel)`       | 清除事件接收报文的 busoff                                                     |
 | `MicroCom_Can_DisableNonDiagnosticCom(channel)`    | 挂起通道上所有非诊断报文                                                      |
 | `MicroCom_Can_EnableNonDiagnosticCom(channel)`     | 恢复通道上所有非诊断报文                                                      |
