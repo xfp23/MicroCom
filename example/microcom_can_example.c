@@ -220,7 +220,7 @@ static void App_1msTick(void)
 /** 挂到 CAN 接收中断/任务，把驱动收到的一帧喂给调度器 */
 static void App_CanRxCallback(uint8_t channel, uint32_t id, const uint8_t *data, uint8_t len)
 {
-    MicroCom_Status_t st = MicroCom_Can_RxIndication(channel, id, data, len);
+    MicroCom_Status_t st = MicroCom_Can_RxIndication(channel, id, true,data, len);
 
     if (st == MICROCOM_NOT_FIND)
     {
