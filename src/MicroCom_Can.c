@@ -35,24 +35,26 @@ MicroCom_Status_t MicroCom_Can_Init(void)
 
 void MicroCom_Can_Start(void)
 {
-    uint32_t now;
+    uint32_t now = 0;
 
-    // MICROCOM_ENTER_CRITICAL();
     now = can_obj.tick;
 
     for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
     {
         for (uint32_t i = 0; i < MICROCOM_CAN_CYCLEMSG_SIZE; i++)
         {
-            MICROCOM_SKIP_INVALID(can_obj.CycleTx[ch][i].is_valid);
-            can_obj.CycleTx[ch][i].next_time = now;
-            MICROCOM_SKIP_INVALID(can_obj.CycleRx[ch][i].is_valid);
-            can_obj.CycleRx[ch][i].last_rx_time = now;
+            if (can_obj.CycleTx[ch][i].is_valid)
+            {
+                can_obj.CycleTx[ch][i].next_time = now;
+            }
+
+            if (can_obj.CycleRx[ch][i].is_valid)
+            {
+                can_obj.CycleRx[ch][i].last_rx_time = now;
+            }
         }
     }
-
     can_obj.enable = true;
-    // MICROCOM_EXIT_CRITICAL();
 }
 
 void MicroCom_Can_Stop(void)
@@ -91,22 +93,26 @@ MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_
         MicroCom_CanCycleTxMsg_t *slot = &can_obj.CycleTx[ch][index[ch]];
         index[ch]++;
 
-        slot->id        = table[i].id;
+        slot->id = table[i].id;
         slot->is_Extend = table[i].is_Extend;
-        slot->dlc       = table[i].dlc;
-        slot->mbox_id   = table[i].mbox_id;
-        slot->channel   = table[i].channel;
-        slot->is_diag   = table[i].is_diag;
-        slot->cycle     = table[i].cycle;
-        slot->data      = table[i].data;
-        slot->userData  = table[i].userData;
-        slot->func      = table[i].func;
+        slot->dlc = table[i].dlc;
+        slot->mbox_id = table[i].mbox_id;
+        slot->channel = table[i].channel;
+        slot->is_diag = table[i].is_diag;
+        slot->cycle = table[i].cycle;
+        slot->data = table[i].data;
+        slot->userData = table[i].userData;
+        slot->func = table[i].func;
 
-        slot->is_run    = true;
+        slot->is_run = true;
         slot->next_time = can_obj.tick;
-        slot->is_valid  = true;
+        slot->is_valid = true;
     }
 
+    for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
+    {
+        can_obj.c_tx_num[ch] = index[ch];
+    }
     return MICROCOM_STATUS_OK;
 }
 
@@ -137,21 +143,26 @@ MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_
         MicroCom_CanCycleRxMsg_t *slot = &can_obj.CycleRx[ch][index[ch]];
         index[ch]++;
 
-        slot->id        = table[i].id;
+        slot->id = table[i].id;
         slot->is_Extend = table[i].is_Extend;
-        slot->dlc       = table[i].dlc;
-        slot->mbox_id   = table[i].mbox_id;
-        slot->channel   = table[i].channel;
-        slot->is_diag   = table[i].is_diag;
-        slot->timeout   = table[i].timeout;
-        slot->data      = table[i].data;
-        slot->userData  = table[i].userData;
-        slot->func      = table[i].func;
+        slot->dlc = table[i].dlc;
+        slot->mbox_id = table[i].mbox_id;
+        slot->channel = table[i].channel;
+        slot->is_diag = table[i].is_diag;
+        slot->timeout = table[i].timeout;
+        slot->data = table[i].data;
+        slot->userData = table[i].userData;
+        slot->func = table[i].func;
 
-        slot->is_run        = true;
-        slot->is_offline    = false;
-        slot->last_rx_time  = can_obj.tick;
-        slot->is_valid      = true;
+        slot->is_run = true;
+        slot->is_offline = false;
+        slot->last_rx_time = can_obj.tick;
+        slot->is_valid = true;
+    }
+
+    for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
+    {
+        can_obj.c_rx_num[ch] = index[ch];
     }
 
     return MICROCOM_STATUS_OK;
@@ -184,19 +195,24 @@ MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_
         MicroCom_CanEventTxMsg_t *slot = &can_obj.EventTx[ch][index[ch]];
         index[ch]++;
 
-        slot->id        = table[i].id;
+        slot->id = table[i].id;
         slot->is_Extend = table[i].is_Extend;
-        slot->dlc       = table[i].dlc;
-        slot->mbox_id   = table[i].mbox_id;
-        slot->channel   = table[i].channel;
-        slot->is_diag   = table[i].is_diag;
-        slot->data      = table[i].data;
-        slot->userData  = table[i].userData;
-        slot->func      = table[i].func;
+        slot->dlc = table[i].dlc;
+        slot->mbox_id = table[i].mbox_id;
+        slot->channel = table[i].channel;
+        slot->is_diag = table[i].is_diag;
+        slot->data = table[i].data;
+        slot->userData = table[i].userData;
+        slot->func = table[i].func;
 
-        slot->is_run   = true;
-        slot->trigger  = 0;
+        slot->is_run = true;
+        slot->trigger = 0;
         slot->is_valid = true;
+    }
+
+    for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
+    {
+        can_obj.e_tx_num[ch] = index[ch];
     }
 
     return MICROCOM_STATUS_OK;
@@ -229,19 +245,24 @@ MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_
         MicroCom_CanEventRxMsg_t *slot = &can_obj.EventRx[ch][index[ch]];
         index[ch]++;
 
-        slot->id        = table[i].id;
+        slot->id = table[i].id;
         slot->is_Extend = table[i].is_Extend;
-        slot->dlc       = table[i].dlc;
-        slot->mbox_id   = table[i].mbox_id;
-        slot->channel   = table[i].channel;
-        slot->is_diag   = table[i].is_diag;
-        slot->data      = table[i].data;
-        slot->userData  = table[i].userData;
-        slot->func      = table[i].func;
+        slot->dlc = table[i].dlc;
+        slot->mbox_id = table[i].mbox_id;
+        slot->channel = table[i].channel;
+        slot->is_diag = table[i].is_diag;
+        slot->data = table[i].data;
+        slot->userData = table[i].userData;
+        slot->func = table[i].func;
 
-        slot->is_run     = true;
+        slot->is_run = true;
         slot->is_offline = false;
-        slot->is_valid   = true;
+        slot->is_valid = true;
+    }
+
+    for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
+    {
+        can_obj.e_rx_num[ch] = index[ch];
     }
 
     return MICROCOM_STATUS_OK;
@@ -270,7 +291,7 @@ void MicroCom_Can_TimerHandler(void)
 
     for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
     {
-        for (uint32_t i = 0; i < MICROCOM_CAN_CYCLEMSG_SIZE; i++)
+        for (uint32_t i = 0; i < can_obj.c_tx_num[ch]; i++)
         {
             MicroCom_CanCycleTxMsg_t *tx = &can_obj.CycleTx[ch][i];
 
@@ -285,7 +306,7 @@ void MicroCom_Can_TimerHandler(void)
             }
         }
 
-        for (uint32_t i = 0; i < MICROCOM_CAN_CYCLEMSG_SIZE; i++)
+        for (uint32_t i = 0; i < can_obj.c_rx_num[ch]; i++)
         {
             MicroCom_CanCycleRxMsg_t *rx = &can_obj.CycleRx[ch][i];
             MICROCOM_SKIP_INVALID(rx->is_valid);
@@ -299,7 +320,7 @@ void MicroCom_Can_TimerHandler(void)
             }
         }
 
-        for (uint32_t i = 0; i < MICROCOM_CAN_EVENTMSG_SIZE; i++)
+        for (uint32_t i = 0; i < can_obj.e_tx_num[ch]; i++)
         {
             MicroCom_CanEventTxMsg_t *tx = &can_obj.EventTx[ch][i];
             MICROCOM_SKIP_INVALID(tx->is_valid);
@@ -318,7 +339,7 @@ void MicroCom_Can_TimerHandler(void)
 /* 接收处理                                                                   */
 /* ========================================================================= */
 
-MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, const uint8_t *data, uint8_t len)
+MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bool is_Extend, const uint8_t *data, uint8_t len)
 {
     MICROCOM_CHECK_CAN_CHANNEL(channel);
     MICROCOM_CHECK_PTR(data);
@@ -329,13 +350,13 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, co
     }
 
     /* 先在周期接收表里找 */
-    for (size_t i = 0; i < MICROCOM_CAN_CYCLEMSG_SIZE; i++)
+    for (size_t i = 0; i < can_obj.c_rx_num[channel]; i++)
     {
         MicroCom_CanCycleRxMsg_t *rx = &can_obj.CycleRx[channel][i];
 
         MICROCOM_SKIP_INVALID(rx->is_valid);
 
-        if (!rx->is_run || rx->id != can_id)
+        if (!rx->is_run || rx->id != can_id || rx->is_Extend != is_Extend)
         {
             continue;
         }
@@ -362,13 +383,13 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, co
     }
 
     /* 再在事件接收表里找 */
-    for (size_t i = 0; i < MICROCOM_CAN_EVENTMSG_SIZE; i++)
+    for (size_t i = 0; i < can_obj.e_rx_num[channel]; i++)
     {
         MicroCom_CanEventRxMsg_t *rx = &can_obj.EventRx[channel][i];
 
         MICROCOM_SKIP_INVALID(rx->is_valid);
 
-        if (!rx->is_run || rx->id != can_id)
+        if (!rx->is_run || rx->id != can_id || rx->is_Extend != is_Extend)
         {
             continue;
         }
@@ -404,7 +425,7 @@ MicroCom_Status_t MicroCom_Can_Trigger_EventMsg(uint32_t id, uint8_t channel)
         return MICROCOM_STATUS_BUSY;
     }
 
-    for (uint32_t i = 0; i < MICROCOM_CAN_EVENTMSG_SIZE; i++)
+    for (uint32_t i = 0; i < can_obj.e_tx_num[channel]; i++)
     {
         MicroCom_CanEventTxMsg_t *tx = &can_obj.EventTx[channel][i];
 
@@ -431,7 +452,7 @@ MicroCom_Status_t MicroCom_Can_SetEventOffline(uint32_t id, uint8_t channel)
         return MICROCOM_STATUS_BUSY;
     }
 
-    for (uint32_t i = 0; i < MICROCOM_CAN_EVENTMSG_SIZE; i++)
+    for (uint32_t i = 0; i < can_obj.e_rx_num[channel]; i++)
     {
         MicroCom_CanEventRxMsg_t *rx = &can_obj.EventRx[channel][i];
 
@@ -457,7 +478,7 @@ MicroCom_Status_t MicroCom_Can_ClearEventOffline(uint32_t id, uint8_t channel)
         return MICROCOM_STATUS_BUSY;
     }
 
-    for (uint32_t i = 0; i < MICROCOM_CAN_EVENTMSG_SIZE; i++)
+    for (uint32_t i = 0; i < can_obj.e_rx_num[channel]; i++)
     {
         MicroCom_CanEventRxMsg_t *rx = &can_obj.EventRx[channel][i];
 
@@ -482,26 +503,32 @@ MicroCom_Status_t MicroCom_Can_DisableNonDiagnosticCom(uint8_t channel)
         return MICROCOM_STATUS_BUSY;
     }
 
-    for (uint32_t i = 0; i < MICROCOM_CAN_CYCLEMSG_SIZE; i++)
+    for (uint32_t i = 0; i < can_obj.c_tx_num[channel]; i++)
     {
         if (can_obj.CycleTx[channel][i].is_valid && !can_obj.CycleTx[channel][i].is_diag)
         {
             can_obj.CycleTx[channel][i].is_run = false;
         }
+    }
 
+    for(uint32_t i = 0; i < can_obj.c_rx_num[channel]; i++)
+    {
         if (can_obj.CycleRx[channel][i].is_valid && !can_obj.CycleRx[channel][i].is_diag)
         {
             can_obj.CycleRx[channel][i].is_run = false;
         }
     }
 
-    for (uint32_t i = 0; i < MICROCOM_CAN_EVENTMSG_SIZE; i++)
+    for (uint32_t i = 0; i < can_obj.e_tx_num[channel]; i++)
     {
         if (can_obj.EventTx[channel][i].is_valid && !can_obj.EventTx[channel][i].is_diag)
         {
             can_obj.EventTx[channel][i].is_run = false;
         }
+    }
 
+    for(uint32_t i = 0; i < can_obj.e_rx_num[channel]; i++)
+    {
         if (can_obj.EventRx[channel][i].is_valid && !can_obj.EventRx[channel][i].is_diag)
         {
             can_obj.EventRx[channel][i].is_run = false;
@@ -520,32 +547,37 @@ MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel)
         return MICROCOM_STATUS_BUSY;
     }
 
-    for (uint32_t i = 0; i < MICROCOM_CAN_CYCLEMSG_SIZE; i++)
+    for (uint32_t i = 0; i < can_obj.c_tx_num[channel]; i++)
     {
         if (can_obj.CycleTx[channel][i].is_valid && !can_obj.CycleTx[channel][i].is_diag)
         {
             can_obj.CycleTx[channel][i].is_run = true;
         }
+    }
 
+    for(uint32_t i = 0; i < can_obj.c_rx_num[channel]; i++)
+    {
         if (can_obj.CycleRx[channel][i].is_valid && !can_obj.CycleRx[channel][i].is_diag)
         {
             can_obj.CycleRx[channel][i].is_run = true;
         }
     }
 
-    for (uint32_t i = 0; i < MICROCOM_CAN_EVENTMSG_SIZE; i++)
+    for (uint32_t i = 0; i < can_obj.e_tx_num[channel]; i++)
     {
         if (can_obj.EventTx[channel][i].is_valid && !can_obj.EventTx[channel][i].is_diag)
         {
             can_obj.EventTx[channel][i].is_run = true;
         }
+    }
 
+    for(uint32_t i = 0; i < can_obj.e_rx_num[channel]; i++)
+    {
         if (can_obj.EventRx[channel][i].is_valid && !can_obj.EventRx[channel][i].is_diag)
         {
             can_obj.EventRx[channel][i].is_run = true;
         }
     }
-
     return MICROCOM_STATUS_OK;
 }
 

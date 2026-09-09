@@ -163,7 +163,12 @@ typedef struct
     MicroCom_CanEventRxMsg_t EventRx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_SIZE];
 
     volatile uint32_t tick;
-    volatile bool     enable;
+    volatile bool enable;
+
+    uint32_t c_tx_num[MICROCOM_CAN_CHANNEL_NUM];
+    uint32_t c_rx_num[MICROCOM_CAN_CHANNEL_NUM];
+    uint32_t e_tx_num[MICROCOM_CAN_CHANNEL_NUM];
+    uint32_t e_rx_num[MICROCOM_CAN_CHANNEL_NUM];
 } MicroCOM_CAN_Obj_t;
 
 #ifdef __cplusplus
