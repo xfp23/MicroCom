@@ -27,6 +27,8 @@ extern "C"
 /* Capacity Configuration                                                   */
 /* ------------------------------------------------------------------------ */
 
+#define MICROCOM_FREQ_HZ (1000u)
+
 /**
 
 * @brief Number of supported CAN channels.

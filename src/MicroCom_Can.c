@@ -592,3 +592,24 @@ MicroCom_Status_t __attribute__((weak)) MicroCom_Can_Transmit(uint8_t channel, u
 
     return MICROCOM_STATUS_OK;
 }
+
+
+bool MicroCom_Can_IsCycleRxBusOffline(uint8_t channel, uint32_t id, bool is_extend)
+{
+    if(channel >= MICROCOM_CAN_CHANNEL_NUM)
+    {
+        return false;
+    }
+
+    for(int i = 0; i < can_obj.c_rx_num; i++)
+    {
+        MicroCom_CanCycleRxMsg_t *msg = &can_obj.CycleRx[channel][i];
+
+        if(msg->id == id && msg->is_Extend == is_extend)
+        {
+            return msg->is_offline;
+        }
+    }
+
+    return false;
+}

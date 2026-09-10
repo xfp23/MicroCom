@@ -4,9 +4,9 @@
  * @brief Public interface for the MicroCom CAN message scheduling module.
  * @version 0.1
  * @date 2026-09-09
- * 
+ *
  * @copyright Copyright (c) 2026
- * 
+ *
  */
 
 #ifndef MICROCOM_CAN_H
@@ -207,6 +207,17 @@ MicroCom_Status_t MicroCom_Can_DisableNonDiagnosticCom(uint8_t channel);
 * @return MicroCom_Status_t
     */
 MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel);
+
+/**
+ * @brief get the Frame offline Status
+ *
+ * @param channel CAN channel
+ * @param id    CAN ID
+ * @param is_extend CAN identifier type
+ * @return true offline
+ * @return false no offline
+ */
+extern bool MicroCom_Can_IsCycleRxBusOffline(uint8_t channel, uint32_t id, bool is_extend);
 
 /* ------------------------------------------------------------------------ */
 /* CAN Driver Hook                                                          */

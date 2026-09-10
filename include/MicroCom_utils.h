@@ -33,6 +33,8 @@ extern "C"
 
 #define MICROCOM_SKIP_INVALID(x) if(!x) { continue; }
 
+#define MICROCOM_MS_TICK(ms) (((uint32_t)(ms) * MICROCOM_FREQ_HZ) / 1000U)
+
 #ifdef __cplusplus
 }
 #endif
