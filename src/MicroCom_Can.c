@@ -302,7 +302,10 @@ void MicroCom_Can_TimerHandler(void)
                 tx->next_time += tx->cycle;
 
                 MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_TX);
-                MicroCom_Can_Transmit(ch, tx->id, tx->mbox_id, tx->dlc, tx->data, tx->is_Extend);
+                if(MicroCom_Can_Transmit(ch, tx->id, tx->mbox_id, tx->dlc, tx->data, tx->is_Extend) != MICROCOM_STATUS_OK)
+                {
+                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_ERROR);
+                }
             }
         }
 
@@ -329,7 +332,10 @@ void MicroCom_Can_TimerHandler(void)
             {
                 tx->trigger--;
                 MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_TX);
-                MicroCom_Can_Transmit(ch, tx->id, tx->mbox_id, tx->dlc, tx->data, tx->is_Extend);
+                if(MicroCom_Can_Transmit(ch, tx->id, tx->mbox_id, tx->dlc, tx->data, tx->is_Extend) != MICROCOM_STATUS_OK)
+                {
+                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_ERROR);
+                }
             }
         }
     }
