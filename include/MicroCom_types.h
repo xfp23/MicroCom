@@ -105,6 +105,8 @@ typedef struct
     volatile bool     is_offline; // 离线超时
     volatile uint32_t last_rx_time;/* 最近一次收到报文（或重置）时的 tick */
 
+    volatile bool is_trigger; // 触发回调
+
     bool is_valid;           // 有效
 } MicroCom_CanCycleRxMsg_t;
 
@@ -146,6 +148,8 @@ typedef struct
     void    *userData;
     MicroCom_Func_t func;
 
+    volatile bool is_trigger; // 触发回调
+    
     volatile bool is_run;
     volatile bool is_offline;   /* 事件报文无自动超时机制，由 Set/ClearEventBusOff 管理 */
 
@@ -159,16 +163,20 @@ typedef struct
 {
     MicroCom_CanCycleTxMsg_t CycleTx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_CYCLEMSG_SIZE];
     MicroCom_CanCycleRxMsg_t CycleRx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_CYCLEMSG_SIZE];
+#if MICROCOM_CAN_EVENTMSG_ENABLE
     MicroCom_CanEventTxMsg_t EventTx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_SIZE];
     MicroCom_CanEventRxMsg_t EventRx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_SIZE];
+#endif
 
     volatile uint32_t tick;
     volatile bool enable;
 
     uint32_t c_tx_num[MICROCOM_CAN_CHANNEL_NUM];
     uint32_t c_rx_num[MICROCOM_CAN_CHANNEL_NUM];
+#if MICROCOM_CAN_EVENTMSG_ENABLE
     uint32_t e_tx_num[MICROCOM_CAN_CHANNEL_NUM];
     uint32_t e_rx_num[MICROCOM_CAN_CHANNEL_NUM];
+#endif 
 } MicroCOM_CAN_Obj_t;
 
 #ifdef __cplusplus

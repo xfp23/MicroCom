@@ -30,6 +30,12 @@ extern "C"
 #define MICROCOM_FREQ_HZ (1000u)
 
 /**
+ * @brief Event Msg Enable Switch
+ * 
+ */
+#define MICROCOM_CAN_EVENTMSG_ENABLE (0u)
+
+/**
 
 * @brief Number of supported CAN channels.
 *
@@ -43,15 +49,18 @@ extern "C"
 *
 * The TX and RX message tables each have this number of independent slots.
 */
-#define MICROCOM_CAN_CYCLEMSG_SIZE    (8u)
+#define MICROCOM_CAN_CYCLEMSG_SIZE    (6u)
 
+#if MICROCOM_CAN_EVENTMSG_ENABLE
 /**
 
 * @brief Number of event-driven message slots per CAN channel.
 *
 * The TX and RX message tables each have this number of independent slots.
 */
-#define MICROCOM_CAN_EVENTMSG_SIZE    (8u)
+#define MICROCOM_CAN_EVENTMSG_SIZE    (1u)
+
+#endif
 
 /**
 

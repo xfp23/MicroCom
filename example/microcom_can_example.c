@@ -248,7 +248,7 @@ static void App_ExitDiagSession(uint8_t channel)
 static void App_OnDoorButtonPressed(void)
 {
     s_door_request_tx[0] = 0x01; /* 请求开锁 */
-    MicroCom_Can_Trigger_EventMsg(ID_DOOR_REQUEST, CH_BODY);
+    MicroCom_Can_Trigger_EventTxMsg(ID_DOOR_REQUEST, CH_BODY);
 }
 
 /* ------------------------------------------------------------------------ */

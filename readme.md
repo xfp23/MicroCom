@@ -123,7 +123,7 @@ Macros in `MicroCom_conf.h`:
 | `MicroCom_Can_TickHandler(void)`                        | Advance the scheduling tick                                                         |
 | `MicroCom_Can_TimerHandler(void)`                       | Periodic scheduling (TX send / RX timeout / event consumption)                      |
 | `MicroCom_Can_RxIndication(channel, id, data, len)`     | Feed in one received frame                                                          |
-| `MicroCom_Can_Trigger_EventMsg(id, channel)`            | Trigger one event TX message                                                        |
+| `MicroCom_Can_Trigger_EventTxMsg(id, channel)`            | Trigger one event TX message                                                        |
 | `MicroCom_Can_SetEventOffline(id, channel)`              | Set busoff on an event RX message                                                   |
 | `MicroCom_Can_ClearEventBusOff(id, channel)`            | Clear busoff on an event RX message                                                 |
 | `MicroCom_Can_DisableNonDiagnosticCom(channel)`         | Suspend all non-diagnostic messages on a channel                                    |

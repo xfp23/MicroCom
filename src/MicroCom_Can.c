@@ -10,11 +10,11 @@
  */
 #include "MicroCom_Can.h"
 #include "MicroCom_utils.h"
-#include <string.h>
+#include "string.h"
 
 static MicroCOM_CAN_Obj_t can_obj = {0};
 
-static inline void MicroCom_Can_Invoke(MicroCom_Func_t func, void *userData, uint8_t channel, uint32_t id, MicroCom_Event_t event)
+static void MicroCom_Can_Invoke(MicroCom_Func_t func, void *userData, uint8_t channel, uint32_t id, MicroCom_Event_t event)
 {
     if (func != NULL)
     {
@@ -62,9 +62,6 @@ void MicroCom_Can_Stop(void)
     can_obj.enable = false;
 }
 
-/* ========================================================================= */
-/* 注册                                                                       */
-/* ========================================================================= */
 
 MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_t *table, size_t size)
 {
@@ -158,6 +155,7 @@ MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_
         slot->is_offline = false;
         slot->last_rx_time = can_obj.tick;
         slot->is_valid = true;
+        slot->is_trigger = false;
     }
 
     for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
@@ -167,7 +165,7 @@ MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_
 
     return MICROCOM_STATUS_OK;
 }
-
+#if MICROCOM_CAN_EVENTMSG_ENABLE
 MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_t *table, size_t size)
 {
     MICROCOM_CHECK_PTR(table);
@@ -258,6 +256,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_
         slot->is_run = true;
         slot->is_offline = false;
         slot->is_valid = true;
+        slot->is_trigger = false;
     }
 
     for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
@@ -267,6 +266,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_
 
     return MICROCOM_STATUS_OK;
 }
+#endif
 
 /* ========================================================================= */
 /* Tick / Timer                                                              */
@@ -316,13 +316,18 @@ void MicroCom_Can_TimerHandler(void)
 
             if (rx->is_run && !rx->is_offline && (now - rx->last_rx_time >= rx->timeout))
             {
-                // rx->last_rx_time += rx->timeout;
                 rx->is_offline = true;
 
                 MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_EVENT_ERROR);
             }
-        }
 
+            if(rx->is_run && rx->is_trigger)
+            {
+                rx->is_trigger = false;
+                MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_EVENT_RX);
+            }
+        }
+#if MICROCOM_CAN_EVENTMSG_ENABLE
         for (uint32_t i = 0; i < can_obj.e_tx_num[ch]; i++)
         {
             MicroCom_CanEventTxMsg_t *tx = &can_obj.EventTx[ch][i];
@@ -338,12 +343,20 @@ void MicroCom_Can_TimerHandler(void)
                 }
             }
         }
+
+        for (uint32_t i = 0; i < can_obj.e_rx_num[ch]; i++)
+        {
+            MicroCom_CanEventRxMsg_t *rx = &can_obj.EventRx[ch][i];
+
+            if (rx->is_run && rx->is_trigger)
+            {
+                MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_EVENT_RX);
+            }
+        }
+#endif
     }
 }
 
-/* ========================================================================= */
-/* 接收处理                                                                   */
-/* ========================================================================= */
 
 MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bool is_Extend, const uint8_t *data, uint8_t len)
 {
@@ -355,7 +368,6 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bo
         return MICROCOM_STATUS_BUSY;
     }
 
-    /* 先在周期接收表里找 */
     for (size_t i = 0; i < can_obj.c_rx_num[channel]; i++)
     {
         MicroCom_CanCycleRxMsg_t *rx = &can_obj.CycleRx[channel][i];
@@ -372,7 +384,7 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bo
             return MICROCOM_STATUS_ERR;
         }
 
-        if (len > rx->dlc) /* 防止用户 data 缓冲区（按 dlc 分配）被越界写 */
+        if (len > rx->dlc)
         {
             return MICROCOM_STATUS_ERR;
         }
@@ -380,15 +392,13 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bo
         memset(rx->data, 0, rx->dlc);
         memcpy(rx->data, data, len);
 
-        rx->last_rx_time = can_obj.tick; /* 收到报文，重置超时计时基准 */
+        rx->last_rx_time = can_obj.tick;
         rx->is_offline = false;
-
-        MicroCom_Can_Invoke(rx->func, rx->userData, channel, can_id, MICROCOM_EVENT_RX);
+        rx->is_trigger = true;
 
         return MICROCOM_STATUS_OK;
     }
-
-    /* 再在事件接收表里找 */
+#if MICROCOM_CAN_EVENTMSG_ENABLE
     for (size_t i = 0; i < can_obj.e_rx_num[channel]; i++)
     {
         MicroCom_CanEventRxMsg_t *rx = &can_obj.EventRx[channel][i];
@@ -412,17 +422,17 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bo
 
         memset(rx->data, 0, rx->dlc);
         memcpy(rx->data, data, len);
+        rx->is_trigger = true;
 
-        MicroCom_Can_Invoke(rx->func, rx->userData, channel, can_id, MICROCOM_EVENT_RX);
-
-        /* 事件报文无自动 is_offline 处理机制，由用户通过 Set/ClearEventis_offline 管理 */
         return MICROCOM_STATUS_OK;
     }
+#endif
 
     return MICROCOM_NOT_FIND;
 }
 
-MicroCom_Status_t MicroCom_Can_Trigger_EventMsg(uint32_t id, uint8_t channel)
+#if MICROCOM_CAN_EVENTMSG_ENABLE
+MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel)
 {
     MICROCOM_CHECK_CAN_CHANNEL(channel);
 
@@ -499,6 +509,7 @@ MicroCom_Status_t MicroCom_Can_ClearEventOffline(uint32_t id, uint8_t channel)
 
     return MICROCOM_NOT_FIND;
 }
+#endif
 
 MicroCom_Status_t MicroCom_Can_DisableNonDiagnosticCom(uint8_t channel)
 {
@@ -524,7 +535,7 @@ MicroCom_Status_t MicroCom_Can_DisableNonDiagnosticCom(uint8_t channel)
             can_obj.CycleRx[channel][i].is_run = false;
         }
     }
-
+#if MICROCOM_CAN_EVENTMSG_ENABLE
     for (uint32_t i = 0; i < can_obj.e_tx_num[channel]; i++)
     {
         if (can_obj.EventTx[channel][i].is_valid && !can_obj.EventTx[channel][i].is_diag)
@@ -540,7 +551,7 @@ MicroCom_Status_t MicroCom_Can_DisableNonDiagnosticCom(uint8_t channel)
             can_obj.EventRx[channel][i].is_run = false;
         }
     }
-
+#endif
     return MICROCOM_STATUS_OK;
 }
 
@@ -568,7 +579,7 @@ MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel)
             can_obj.CycleRx[channel][i].is_run = true;
         }
     }
-
+#if MICROCOM_CAN_EVENTMSG_ENABLE
     for (uint32_t i = 0; i < can_obj.e_tx_num[channel]; i++)
     {
         if (can_obj.EventTx[channel][i].is_valid && !can_obj.EventTx[channel][i].is_diag)
@@ -584,10 +595,11 @@ MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel)
             can_obj.EventRx[channel][i].is_run = true;
         }
     }
+#endif
     return MICROCOM_STATUS_OK;
 }
 
-MicroCom_Status_t __attribute__((weak)) MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox, uint8_t dlc, const uint8_t *data, bool is_extend)
+MicroCom_Status_t /* __attribute__((weak))*/ MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox, uint8_t dlc, const uint8_t *data, bool is_extend)
 {
     (void)channel;
     (void)can_id;
@@ -607,7 +619,7 @@ bool MicroCom_Can_IsCycleRxBusOffline(uint8_t channel, uint32_t id, bool is_exte
         return false;
     }
 
-    for(int i = 0; i < can_obj.c_rx_num; i++)
+    for(uint32_t i = 0; i < can_obj.c_rx_num[channel]; i++)
     {
         MicroCom_CanCycleRxMsg_t *msg = &can_obj.CycleRx[channel][i];
 
