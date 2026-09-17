@@ -36,7 +36,7 @@ extern "C"
 
 #define MICROCOM_MS_TICK(ms) (((uint32_t)(ms) * MICROCOM_FREQ_HZ) / 1000U)
 
-#define MICROCOM_SIZEOF(x) ((size_t)(x / x[0])) 
+#define MICROCOM_SIZEOF(x) ((size_t)(sizeof(x) / sizeof(x[0])))
 
 #ifdef __cplusplus
 }
