@@ -9,7 +9,7 @@
 
 #include "MicroCom_conf.h"
 #include "MicroCom_types.h"
-#include <stddef.h>
+#include "stddef.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -34,6 +34,8 @@ extern "C"
 #define MICROCOM_SKIP_INVALID(x) if(!x) { continue; }
 
 #define MICROCOM_MS_TICK(ms) (((uint32_t)(ms) * MICROCOM_FREQ_HZ) / 1000U)
+
+#define MICROCOM_SIZEOF(x) ((size_t)(x / x[0])) 
 
 #ifdef __cplusplus
 }

@@ -21,7 +21,7 @@ extern "C"
 
 * @brief MicroCom version string.
 */
-#define MICROCOM_VERSION    "0.0.3"
+#define MICROCOM_VERSION    "1.0.3"
 
 /* ------------------------------------------------------------------------ */
 /* Capacity Configuration                                                   */

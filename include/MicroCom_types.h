@@ -11,9 +11,10 @@
 #define MICROCOM_TYPES_H
 
 #include "MicroCom_conf.h"
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "MicroCom_utils.h"
+#include "stdbool.h"
+#include "stddef.h"
+#include "stdint.h"
 
 #ifdef __cplusplus
 extern "C"
