@@ -162,11 +162,11 @@ typedef struct
 /* ------------------------------------------------------------------------ */
 typedef struct
 {
-    MicroCom_CanCycleTxMsg_t CycleTx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_CYCLEMSG_SIZE];
-    MicroCom_CanCycleRxMsg_t CycleRx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_CYCLEMSG_SIZE];
+    MicroCom_CanCycleTxMsg_t CycleTx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_CYCLEMSG_TX_SIZE];
+    MicroCom_CanCycleRxMsg_t CycleRx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_CYCLEMSG_RX_SIZE];
 #if MICROCOM_CAN_EVENTMSG_ENABLE
-    MicroCom_CanEventTxMsg_t EventTx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_SIZE];
-    MicroCom_CanEventRxMsg_t EventRx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_SIZE];
+    MicroCom_CanEventTxMsg_t EventTx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_TX_SIZE];
+    MicroCom_CanEventRxMsg_t EventRx[MICROCOM_CAN_CHANNEL_NUM][MICROCOM_CAN_EVENTMSG_RX_SIZE];
 #endif
 
     volatile uint32_t tick;

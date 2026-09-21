@@ -41,13 +41,16 @@ void MicroCom_Can_Start(void)
 
     for (uint8_t ch = 0; ch < MICROCOM_CAN_CHANNEL_NUM; ch++)
     {
-        for (uint32_t i = 0; i < MICROCOM_CAN_CYCLEMSG_SIZE; i++)
+        for (uint32_t i = 0; i < MICROCOM_CAN_CYCLEMSG_TX_SIZE; i++)
         {
             if (can_obj.CycleTx[ch][i].is_valid)
             {
                 can_obj.CycleTx[ch][i].next_time = now;
             }
+        }
 
+        for (uint32_t i = 0; i < MICROCOM_CAN_CYCLEMSG_RX_SIZE; i++)
+        {
             if (can_obj.CycleRx[ch][i].is_valid)
             {
                 can_obj.CycleRx[ch][i].last_rx_time = now;
@@ -66,7 +69,7 @@ void MicroCom_Can_Stop(void)
 MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_t *table, size_t size)
 {
     MICROCOM_CHECK_PTR(table);
-    MICROCOM_CHECK_CYCLE_CAN_SIZE(size);
+    MICROCOM_CHECK_CYCLE_CAN_TX_SIZE(size);
 
     uint32_t count[MICROCOM_CAN_CHANNEL_NUM] = {0};
 
@@ -75,7 +78,7 @@ MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_
         MICROCOM_CHECK_CAN_CHANNEL(table[i].channel);
         MICROCOM_CHECK_DLC(table[i].dlc);
 
-        if (count[table[i].channel] >= MICROCOM_CAN_CYCLEMSG_SIZE)
+        if (count[table[i].channel] >= MICROCOM_CAN_CYCLEMSG_TX_SIZE)
         {
             return MICROCOM_STATUS_ERR;
         }
@@ -116,7 +119,7 @@ MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_
 MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_t *table, size_t size)
 {
     MICROCOM_CHECK_PTR(table);
-    MICROCOM_CHECK_CYCLE_CAN_SIZE(size);
+    MICROCOM_CHECK_CYCLE_CAN_RX_SIZE(size);
 
     uint32_t count[MICROCOM_CAN_CHANNEL_NUM] = {0};
 
@@ -125,7 +128,7 @@ MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_
         MICROCOM_CHECK_CAN_CHANNEL(table[i].channel);
         MICROCOM_CHECK_DLC(table[i].dlc);
 
-        if (count[table[i].channel] >= MICROCOM_CAN_CYCLEMSG_SIZE)
+        if (count[table[i].channel] >= MICROCOM_CAN_CYCLEMSG_RX_SIZE)
         {
             return MICROCOM_STATUS_ERR;
         }
@@ -169,7 +172,7 @@ MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_
 MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_t *table, size_t size)
 {
     MICROCOM_CHECK_PTR(table);
-    MICROCOM_CHECK_EVENT_CAN_SIZE(size);
+    MICROCOM_CHECK_EVENT_CAN_TX_SIZE(size);
 
     uint32_t count[MICROCOM_CAN_CHANNEL_NUM] = {0};
 
@@ -178,7 +181,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_
         MICROCOM_CHECK_CAN_CHANNEL(table[i].channel);
         MICROCOM_CHECK_DLC(table[i].dlc);
 
-        if (count[table[i].channel] >= MICROCOM_CAN_EVENTMSG_SIZE)
+        if (count[table[i].channel] >= MICROCOM_CAN_EVENTMSG_TX_SIZE)
         {
             return MICROCOM_STATUS_ERR;
         }
@@ -219,7 +222,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_
 MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_t *table, size_t size)
 {
     MICROCOM_CHECK_PTR(table);
-    MICROCOM_CHECK_EVENT_CAN_SIZE(size);
+    MICROCOM_CHECK_EVENT_CAN_RX_SIZE(size);
 
     uint32_t count[MICROCOM_CAN_CHANNEL_NUM] = {0};
 
@@ -228,7 +231,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_
         MICROCOM_CHECK_CAN_CHANNEL(table[i].channel);
         MICROCOM_CHECK_DLC(table[i].dlc);
 
-        if (count[table[i].channel] >= MICROCOM_CAN_EVENTMSG_SIZE)
+        if (count[table[i].channel] >= MICROCOM_CAN_EVENTMSG_RX_SIZE)
         {
             return MICROCOM_STATUS_ERR;
         }

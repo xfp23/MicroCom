@@ -22,11 +22,17 @@ extern "C"
 #define MICROCOM_CHECK_CAN_CHANNEL(ch) \
     do { if ((ch) >= MICROCOM_CAN_CHANNEL_NUM) { return MICROCOM_CHANNEL_OVERFLOW; } } while (0)
 
-#define MICROCOM_CHECK_CYCLE_CAN_SIZE(size) \
-    do { if ((size) == 0u || (size) > (MICROCOM_CAN_CHANNEL_NUM * MICROCOM_CAN_CYCLEMSG_SIZE)) { return MICROCOM_PARAM_INVALID; } } while (0)
+#define MICROCOM_CHECK_CYCLE_CAN_RX_SIZE(size) \
+    do { if ((size) == 0u || (size) > (MICROCOM_CAN_CYCLEMSG_RX_SIZE)) { return MICROCOM_PARAM_INVALID; } } while (0)
+
+#define MICROCOM_CHECK_CYCLE_CAN_TX_SIZE(size) \
+    do { if ((size) == 0u || (size) > (MICROCOM_CAN_CYCLEMSG_TX_SIZE)) { return MICROCOM_PARAM_INVALID; } } while (0)
 #if MICROCOM_CAN_EVENTMSG_ENABLE
-#define MICROCOM_CHECK_EVENT_CAN_SIZE(size) \
-    do { if ((size) == 0u || (size) > (MICROCOM_CAN_CHANNEL_NUM * MICROCOM_CAN_EVENTMSG_SIZE)) { return MICROCOM_PARAM_INVALID; } } while (0)
+#define MICROCOM_CHECK_EVENT_CAN_RX_SIZE(size) \
+    do { if ((size) == 0u || (size) > (MICROCOM_CAN_EVENTMSG_RX_SIZE)) { return MICROCOM_PARAM_INVALID; } } while (0)
+
+#define MICROCOM_CHECK_EVENT_CAN_TX_SIZE(size) \
+    do { if ((size) == 0u || (size) > (MICROCOM_CAN_EVENTMSG_TX_SIZE)) { return MICROCOM_PARAM_INVALID; } } while (0)
 #endif
 
 #define MICROCOM_CHECK_DLC(dlc) \
