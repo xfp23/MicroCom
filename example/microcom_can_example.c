@@ -54,12 +54,12 @@ static void OnVehicleSpeed(MicroCom_Ctx_t *ctx)
 {
     switch (ctx->event)
     {
-    case MICROCOM_EVENT_RX:
+    case MICROCOM_EVENT_EVENT_RX:
         printf("[CAN%u] 0x%03X vehicle speed updated: %u km/h\n",
                ctx->channel, (unsigned)ctx->id, s_vehicle_speed_rx[0]);
         break;
 
-    case MICROCOM_EVENT_ERROR:
+    case MICROCOM_EVENT_EVENT_RX_ERROR:
         /* 超过 timeout 未收到车速报文，is_offline 已被组件自动置位并锁存，
          * 直到下一帧正确的车速报文到来才会被 RxIndication 自动清除 */
         printf("[CAN%u] 0x%03X vehicle speed RX timeout, offline!\n",
@@ -78,7 +78,7 @@ static void OnDoorRequestSent(MicroCom_Ctx_t *ctx)
 
 static void OnRemoteKey(MicroCom_Ctx_t *ctx)
 {
-    if (ctx->event == MICROCOM_EVENT_ERROR)
+    if (ctx->event == MICROCOM_EVENT_EVENT_RX_ERROR)
     {
         /* 我们自己通过 SetEventOffline 触发的回调，见下方 */
         printf("[CAN%u] 0x%03X remote key marked offline by app\n",

@@ -21,7 +21,7 @@ extern "C"
 
 * @brief MicroCom version string.
 */
-#define MICROCOM_VERSION "1.0.4"
+#define MICROCOM_VERSION "1.1.0"
 
     /* ------------------------------------------------------------------------ */
     /* Capacity Configuration                                                   */
@@ -33,7 +33,7 @@ extern "C"
  * @brief Event Msg Enable Switch
  *
  */
-#define MICROCOM_CAN_EVENTMSG_ENABLE (0u)
+#define MICROCOM_CAN_EVENTMSG_ENABLE (1u)
 
 /**
 

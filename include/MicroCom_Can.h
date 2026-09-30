@@ -32,7 +32,7 @@ extern "C"
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_Init(void);
+extern MicroCom_Status_t MicroCom_Can_Init(void);
 
 /**
 
@@ -59,7 +59,7 @@ void MicroCom_Can_Stop(void);
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_t *table, size_t size);
+extern MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_t *table, size_t size);
 
 /**
 
@@ -70,7 +70,7 @@ MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_t *table, size_t size);
+extern MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_t *table, size_t size);
 
 #if MICROCOM_CAN_EVENTMSG_ENABLE
 /**
@@ -82,7 +82,7 @@ MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_t *table, size_t size);
+extern MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_t *table, size_t size);
 
 /**
 
@@ -93,7 +93,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_t *table, size_t size);
+extern MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_t *table, size_t size);
 #endif
 /* ------------------------------------------------------------------------ */
 /* Scheduler Handlers                                                       */
@@ -106,7 +106,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_
 * This function should typically be called from a 1 ms timer interrupt
 * or a periodic system tick.
     */
-void MicroCom_Can_TickHandler(void);
+extern void MicroCom_Can_TickHandler(void);
 
 /**
 
@@ -115,7 +115,7 @@ void MicroCom_Can_TickHandler(void);
 * This function should be called periodically from the main loop
 * or a dedicated scheduler task.
     */
-void MicroCom_Can_TimerHandler(void);
+extern void MicroCom_Can_TimerHandler(void);
 
 /* ------------------------------------------------------------------------ */
 /* CAN Receive Interface                                                    */
@@ -135,7 +135,7 @@ void MicroCom_Can_TimerHandler(void);
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bool is_Extend, const uint8_t *data, uint8_t len);
+extern MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bool is_Extend, const uint8_t *data, uint8_t len);
 #if MICROCOM_CAN_EVENTMSG_ENABLE
 /* ------------------------------------------------------------------------ */
 /* Event Message Management                                                 */
@@ -153,7 +153,7 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bo
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel);
+extern MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel);
 
 /**
 
@@ -164,7 +164,7 @@ MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel);
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_SetEventOffline(uint32_t id, uint8_t channel);
+extern MicroCom_Status_t MicroCom_Can_SetEventOffline(uint32_t id, uint8_t channel);
 
 /**
 
@@ -175,7 +175,7 @@ MicroCom_Status_t MicroCom_Can_SetEventOffline(uint32_t id, uint8_t channel);
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_ClearEventOffline(uint32_t id, uint8_t channel);
+extern MicroCom_Status_t MicroCom_Can_ClearEventOffline(uint32_t id, uint8_t channel);
 #endif
 
 /* ------------------------------------------------------------------------ */
@@ -195,7 +195,7 @@ MicroCom_Status_t MicroCom_Can_ClearEventOffline(uint32_t id, uint8_t channel);
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_DisableNonDiagnosticCom(uint8_t channel);
+extern MicroCom_Status_t MicroCom_Can_DisableNonDiagnosticCom(uint8_t channel);
 
 /**
 
@@ -208,7 +208,7 @@ MicroCom_Status_t MicroCom_Can_DisableNonDiagnosticCom(uint8_t channel);
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel);
+extern MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel);
 
 /**
  * @brief get the Frame offline Status
@@ -248,7 +248,20 @@ extern bool MicroCom_Can_IsCycleRxBusOffline(uint8_t channel, uint32_t id, bool 
 *
 * @return MicroCom_Status_t
     */
-MicroCom_Status_t MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox, uint8_t dlc, const uint8_t *data, bool is_extend);
+extern MicroCom_Status_t MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox, uint8_t dlc, const uint8_t *data, bool is_extend);
+
+/**
+ * @brief CAN hardware transmission complete callback.
+ *
+ * This callback is executed in an interrupt context.
+ * Do not perform time-consuming operations or blocking operations here.
+ *
+ * @param channel CAN channel.
+ * @param mboxId  CAN mailbox index.
+ *
+ * @return MicroCom_Status_t
+ */
+extern MicroCom_Status_t MicroCom_Can_HwTxDone(uint8_t channel, uint8_t mboxId);
 
 #ifdef __cplusplus
 }

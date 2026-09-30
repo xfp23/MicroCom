@@ -38,9 +38,21 @@ typedef enum
 
 typedef enum
 {
-    MICROCOM_EVENT_TX,
-    MICROCOM_EVENT_RX,
-    MICROCOM_EVENT_ERROR,
+    MICROCOM_EVENT_CYCLE_TX,
+    MICROCOM_EVENT_EVENT_TX,
+
+    MICROCOM_EVENT_CYCLE_RX,
+    MICROCOM_EVENT_EVENT_RX,
+
+    MICROCOM_EVENT_CYCLE_TX_DONE,
+    MICROCOM_EVENT_EVENT_TX_DONE,
+
+    MICROCOM_EVENT_CYCLE_TX_ERROR,
+    MICROCOM_EVENT_EVENT_TX_ERROR,
+
+    MICROCOM_EVENT_CYCLE_RX_ERROR,
+    MICROCOM_EVENT_EVENT_RX_ERROR,
+
 } MicroCom_Event_t;
 
 /**
@@ -53,6 +65,8 @@ typedef struct
 {
     MicroCom_Event_t event;
     uint8_t          channel;
+    uint16_t          mboxId; 
+    bool             is_extend;
     uint32_t         id;
     void            *userData;
 } MicroCom_Ctx_t;
@@ -80,6 +94,8 @@ typedef struct
     /* --- 运行时字段：内部维护，注册时会被强制初始化，用户无需填写 --- */
     volatile bool     is_run;    /* 是否参与调度 */
     volatile uint32_t next_time; /* 下一次应发送的 tick（内部用，避免周期漂移） */
+
+    volatile bool is_txing; // 是否正在发送
 
     bool is_valid;           // 有效
 } MicroCom_CanCycleTxMsg_t;
@@ -130,6 +146,7 @@ typedef struct
     volatile bool     is_run;
     volatile uint16_t trigger; /* 待发送次数；Trigger 接口 ++，TimerHandler --。
                                    跨上下文读改写，访问时须加临界区保护 */
+    volatile bool is_txing; // 正在发送?
     bool is_valid;           // 有效
 } MicroCom_CanEventTxMsg_t;
 
