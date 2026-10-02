@@ -38,13 +38,13 @@ extern MicroCom_Status_t MicroCom_Can_Init(void);
 
 * @brief Starts the CAN message scheduler.
     */
-void MicroCom_Can_Start(void);
+extern void MicroCom_Can_Start(void);
 
 /**
 
 * @brief Stops the CAN message scheduler.
     */
-void MicroCom_Can_Stop(void);
+extern void MicroCom_Can_Stop(void);
 
 /* ------------------------------------------------------------------------ */
 /* Message Registration                                                     */
@@ -153,7 +153,7 @@ extern MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can
 *
 * @return MicroCom_Status_t
     */
-extern MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel);
+extern MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel,const uint8_t *data,uint16_t len);
 
 /**
 

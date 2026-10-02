@@ -134,12 +134,10 @@ typedef struct
 {
     uint32_t id;
     bool     is_Extend;
-    uint8_t  dlc;
     uint16_t mbox_id;
     uint8_t  channel;
     bool     is_diag;
-
-    uint8_t *data;
+    
     void    *userData;
     MicroCom_Func_t func;
 
@@ -148,6 +146,9 @@ typedef struct
     
     volatile bool is_txing; // 正在发送?
     bool is_valid;           // 有效
+
+    uint8_t  len;
+    uint8_t data[MICROCOM_CAN_MAX_DLC];
 } MicroCom_CanEventTxMsg_t;
 
 /* ------------------------------------------------------------------------ */

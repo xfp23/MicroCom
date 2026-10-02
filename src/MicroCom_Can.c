@@ -181,7 +181,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_
     for (size_t i = 0; i < size; i++)
     {
         MICROCOM_CHECK_CAN_CHANNEL(table[i].channel);
-        MICROCOM_CHECK_DLC(table[i].dlc);
+        // MICROCOM_CHECK_DLC(table[i].dlc);
 
         if (count[table[i].channel] >= MICROCOM_CAN_EVENTMSG_TX_SIZE)
         {
@@ -200,11 +200,11 @@ MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_
 
         slot->id = table[i].id;
         slot->is_Extend = table[i].is_Extend;
-        slot->dlc = table[i].dlc;
         slot->mbox_id = table[i].mbox_id;
         slot->channel = table[i].channel;
         slot->is_diag = table[i].is_diag;
-        slot->data = table[i].data;
+        memset(slot->data,0,MICROCOM_CAN_MAX_DLC);
+        slot->len = 0;
         slot->userData = table[i].userData;
         slot->func = table[i].func;
 
@@ -347,10 +347,12 @@ void MicroCom_Can_TimerHandler(void)
             {
                 tx->trigger = false;
 
-                if (MicroCom_Can_Transmit(ch, tx->id, tx->mbox_id, tx->dlc, tx->data, tx->is_Extend) == MICROCOM_STATUS_OK)
+                if (MicroCom_Can_Transmit(ch, tx->id, tx->mbox_id, tx->len, tx->data, tx->is_Extend) == MICROCOM_STATUS_OK)
                 {
                     tx->is_txing = true;
                     MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_EVENT_TX, tx->mbox_id, tx->is_Extend);
+                    memset(tx->data,0,MICROCOM_CAN_MAX_DLC);
+                    tx->len = 0;
                 }
                 else
                 {
@@ -447,9 +449,11 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bo
 }
 
 #if MICROCOM_CAN_EVENTMSG_ENABLE
-MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel)
+MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel,const uint8_t *data,uint16_t len)
 {
     MICROCOM_CHECK_CAN_CHANNEL(channel);
+    MICROCOM_CHECK_DLC(len);
+    MICROCOM_CHECK_PTR(data);
 
     if (!can_obj.enable)
     {
@@ -466,6 +470,7 @@ MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel)
         {
 
             tx->trigger = true;
+            memcpy(tx->data,data,len);
 
             return MICROCOM_STATUS_OK;
         }
