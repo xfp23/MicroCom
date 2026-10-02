@@ -209,7 +209,7 @@ MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_
         slot->func = table[i].func;
 
         slot->is_run = true;
-        slot->trigger = 0;
+        slot->trigger = false;
         slot->is_valid = true;
         slot->is_txing = false;
     }
@@ -343,9 +343,9 @@ void MicroCom_Can_TimerHandler(void)
             MicroCom_CanEventTxMsg_t *tx = &can_obj.EventTx[ch][i];
             MICROCOM_SKIP_INVALID(tx->is_valid);
 
-            if (tx->is_run && tx->trigger > 0)
+            if (tx->is_run && tx->trigger)
             {
-                tx->trigger--;
+                tx->trigger = false;
 
                 if (MicroCom_Can_Transmit(ch, tx->id, tx->mbox_id, tx->dlc, tx->data, tx->is_Extend) == MICROCOM_STATUS_OK)
                 {
@@ -365,6 +365,7 @@ void MicroCom_Can_TimerHandler(void)
 
             if (rx->is_run && rx->is_trigger)
             {
+            	rx->is_trigger = false;
                 MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_EVENT_EVENT_RX, rx->mbox_id, rx->is_Extend);
             }
         }
@@ -461,10 +462,10 @@ MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel)
 
         MICROCOM_SKIP_INVALID(tx->is_valid);
 
-        if (tx->is_run && tx->id == id && tx->trigger < UINT16_MAX)
+        if (tx->is_run && tx->id == id)
         {
 
-            tx->trigger++;
+            tx->trigger = true;
 
             return MICROCOM_STATUS_OK;
         }
@@ -613,7 +614,7 @@ MicroCom_Status_t MicroCom_Can_EnableNonDiagnosticCom(uint8_t channel)
     return MICROCOM_STATUS_OK;
 }
 
-MicroCom_Status_t /*__attribute__((weak)) */MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox, uint8_t dlc, const uint8_t *data, bool is_extend)
+MicroCom_Status_t /* __attribute__((weak))*/ MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id, uint16_t mbox, uint8_t dlc, const uint8_t *data, bool is_extend)
 {
     (void)channel;
     (void)can_id;
@@ -645,7 +646,7 @@ bool MicroCom_Can_IsCycleRxBusOffline(uint8_t channel, uint32_t id, bool is_exte
     return false;
 }
 
-MicroCom_Status_t MicroCom_Can_HwTxDone(uint8_t channel, uint8_t mboxId)
+MicroCom_Status_t MicroCom_Can_HwTxDone(uint8_t channel, uint16_t mboxId)
 {
     if (!can_obj.enable)
     {

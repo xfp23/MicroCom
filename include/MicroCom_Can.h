@@ -261,7 +261,7 @@ extern MicroCom_Status_t MicroCom_Can_Transmit(uint8_t channel, uint32_t can_id,
  *
  * @return MicroCom_Status_t
  */
-extern MicroCom_Status_t MicroCom_Can_HwTxDone(uint8_t channel, uint8_t mboxId);
+extern MicroCom_Status_t MicroCom_Can_HwTxDone(uint8_t channel, uint16_t mboxId);
 
 #ifdef __cplusplus
 }

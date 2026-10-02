@@ -144,8 +144,8 @@ typedef struct
     MicroCom_Func_t func;
 
     volatile bool     is_run;
-    volatile uint16_t trigger; /* 待发送次数；Trigger 接口 ++，TimerHandler --。
-                                   跨上下文读改写，访问时须加临界区保护 */
+    volatile bool trigger; 
+    
     volatile bool is_txing; // 正在发送?
     bool is_valid;           // 有效
 } MicroCom_CanEventTxMsg_t;
