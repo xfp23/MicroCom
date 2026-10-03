@@ -59,7 +59,7 @@ extern void MicroCom_Can_Stop(void);
 *
 * @return MicroCom_Status_t
     */
-extern MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTxMsg_t *table, size_t size);
+extern MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycleTx_ConfigTable_t *table, size_t size);
 
 /**
 
@@ -70,7 +70,7 @@ extern MicroCom_Status_t MicroCom_Can_Register_CycleTxMsg(const MicroCom_CanCycl
 *
 * @return MicroCom_Status_t
     */
-extern MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRxMsg_t *table, size_t size);
+extern MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycleRx_ConfigTable_t *table, size_t size);
 
 #if MICROCOM_CAN_EVENTMSG_ENABLE
 /**
@@ -82,7 +82,7 @@ extern MicroCom_Status_t MicroCom_Can_Register_CycleRxMsg(const MicroCom_CanCycl
 *
 * @return MicroCom_Status_t
     */
-extern MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTxMsg_t *table, size_t size);
+extern MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEventTx_ConfigTable_t *table, size_t size);
 
 /**
 
@@ -93,7 +93,7 @@ extern MicroCom_Status_t MicroCom_Can_Register_EventTxMsg(const MicroCom_CanEven
 *
 * @return MicroCom_Status_t
     */
-extern MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRxMsg_t *table, size_t size);
+extern MicroCom_Status_t MicroCom_Can_Register_EventRxMsg(const MicroCom_CanEventRx_ConfigTable_t *table, size_t size);
 #endif
 /* ------------------------------------------------------------------------ */
 /* Scheduler Handlers                                                       */
@@ -153,7 +153,7 @@ extern MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can
 *
 * @return MicroCom_Status_t
     */
-extern MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint32_t id, uint8_t channel,const uint8_t *data,uint16_t len);
+extern MicroCom_Status_t MicroCom_Can_Trigger_EventTxMsg(uint8_t channel,uint16_t mboxId,const uint8_t *data,uint16_t len);
 
 /**
 
