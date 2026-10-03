@@ -21,13 +21,21 @@ extern "C"
 
 * @brief MicroCom version string.
 */
-#define MICROCOM_VERSION "1.2.1"
+#define MICROCOM_VERSION "1.2.2"
 
-    /* ------------------------------------------------------------------------ */
-    /* Capacity Configuration                                                   */
-    /* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+/* Capacity Configuration                                                   */
+/* ------------------------------------------------------------------------ */
 
 #define MICROCOM_FREQ_HZ (1000u)
+
+/**
+ * @brief The compontens fast mode enable
+ * 
+ * 0 : disable 1 : enable 
+ * 
+ */
+#define MICROCOM_FASTMODE_ENABLE (1u)
 
 /**
  * @brief Event Msg Enable Switch
@@ -66,7 +74,7 @@ extern "C"
 *
 * The TX and RX message tables each have this number of independent slots.
 */
-#define MICROCOM_CAN_EVENTMSG_TX_SIZE (1u)
+#define MICROCOM_CAN_EVENTMSG_TX_SIZE (3u)
 
 /**
 
@@ -74,7 +82,7 @@ extern "C"
 *
 * The RX message tables each have this number of independent slots.
 */
-#define MICROCOM_CAN_EVENTMSG_RX_SIZE (1u)
+#define MICROCOM_CAN_EVENTMSG_RX_SIZE (3u)
 
 #endif
 
