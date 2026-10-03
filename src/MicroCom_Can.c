@@ -14,7 +14,7 @@
 
 static MicroCOM_CAN_Obj_t can_obj = {0};
 
-static void MicroCom_Can_Invoke(MicroCom_Func_t func, void *userData, uint8_t channel, uint32_t id, MicroCom_Event_t event, uint16_t mboxId, bool is_extend,uint8_t *data,uint8_t len)
+static inline void MicroCom_Can_Invoke(MicroCom_Func_t func, void *userData, uint8_t channel, uint32_t id, MicroCom_Event_t event, uint16_t mboxId, bool is_extend, uint8_t *data, uint8_t len)
 {
     if (func != NULL)
     {
