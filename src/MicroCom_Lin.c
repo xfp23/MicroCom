@@ -30,11 +30,11 @@ static inline void MicroCom_Lin_Invoke(MicroCom_Lin_Table_t *t, MicroCom_Lin_Eve
     if (t->callback != NULL)
     {
         MicroCom_Lin_Ctx_t ctx;
-        ctx.event    = event;
-        ctx.channel  = t->channel;
-        ctx.id       = t->id;
-        ctx.data     = t->data;
-        ctx.len      = t->length;
+        ctx.event = event;
+        ctx.channel = t->channel;
+        ctx.id = t->id;
+        ctx.data = t->data;
+        ctx.len = t->length;
         ctx.userData = t->userdata;
         t->callback(&ctx);
     }
@@ -87,8 +87,8 @@ void MicroCom_Lin_Start(void)
 
     for (uint8_t ch = 0u; ch < MICROCOM_LIN_CHANNEL_NUM; ch++)
     {
-        lin_ptr->busy[ch]        = false;
-        lin_ptr->active_idx[ch]  = MICROCOM_LIN_IDX_INVALID;
+        lin_ptr->busy[ch] = false;
+        lin_ptr->active_idx[ch] = MICROCOM_LIN_IDX_INVALID;
         lin_ptr->scan_cursor[ch] = 0u;
 
         for (uint32_t i = 0u; i < MICROCOM_LIN_MSG_SIZE; i++)
@@ -174,20 +174,20 @@ MicroCom_Status_t MicroCom_Lin_RegisterTable(const MicroCom_Lin_ConfigTable_t *t
         MicroCom_Lin_Table_t *t = &lin_ptr->table[ch][index[ch]];
         index[ch]++;
 
-        t->channel  = table[i].channel;
-        t->id       = table[i].id;
-        t->length   = table[i].length;
-        t->data     = table[i].data;
-        t->cycle    = table[i].period;
-        t->timeout  = table[i].timeout;
-        t->dir      = table[i].dir;
+        t->channel = table[i].channel;
+        t->id = table[i].id;
+        t->length = table[i].length;
+        t->data = table[i].data;
+        t->cycle = table[i].period;
+        t->timeout = table[i].timeout;
+        t->dir = table[i].dir;
         t->callback = table[i].callback;
         t->userdata = table[i].userdata;
 
-        t->next_time    = lin_ptr->tick;
+        t->next_time = lin_ptr->tick;
         t->last_rx_time = lin_ptr->tick;
-        t->is_timeout   = false;
-        t->is_valid     = true;
+        t->is_timeout = false;
+        t->is_valid = true;
 #if MICROCOM_FASTMODE_ENABLE == 0
         t->is_trigger = false;
 #endif
@@ -254,7 +254,7 @@ static void MicroCom_Lin_DispatchChannel(uint8_t ch, uint32_t now)
 
             if (ok)
             {
-                lin_ptr->busy[ch]       = true;
+                lin_ptr->busy[ch] = true;
                 lin_ptr->active_idx[ch] = idx;
                 MicroCom_Lin_Invoke(t, MICROCOM_LIN_EVENT_TX);
             }
@@ -269,7 +269,7 @@ static void MicroCom_Lin_DispatchChannel(uint8_t ch, uint32_t now)
 
             if (ok)
             {
-                lin_ptr->busy[ch]       = true;
+                lin_ptr->busy[ch] = true;
                 lin_ptr->active_idx[ch] = idx;
             }
             /* 提交失败就安静地等下个周期重试，不单独通知用户——
@@ -369,7 +369,7 @@ static MicroCom_Lin_Table_t *MicroCom_Lin_GetActiveEntry(uint8_t channel, uint8_
 
 void MicroCom_Lin_TxDone(uint8_t channel, uint8_t id)
 {
-    if(channel >= MICROCOM_LIN_CHANNEL_NUM)
+    if (channel >= MICROCOM_LIN_CHANNEL_NUM)
     {
         return;
     }
@@ -381,7 +381,7 @@ void MicroCom_Lin_TxDone(uint8_t channel, uint8_t id)
         return;
     }
 
-    lin_ptr->busy[channel]       = false;
+    lin_ptr->busy[channel] = false;
     lin_ptr->active_idx[channel] = MICROCOM_LIN_IDX_INVALID;
 
     MicroCom_Lin_Invoke(t, MICROCOM_LIN_EVENT_TX_DONE);
@@ -401,11 +401,11 @@ void MicroCom_Lin_RxIndication(uint8_t channel, uint8_t id, const uint8_t *data,
     memset(t->data, 0, t->length);
     memcpy(t->data, data, copyLen);
 
-    lin_ptr->busy[channel]       = false;
+    lin_ptr->busy[channel] = false;
     lin_ptr->active_idx[channel] = MICROCOM_LIN_IDX_INVALID;
 
     t->last_rx_time = lin_ptr->tick;
-    t->is_timeout   = false; /* 收到一次成功数据，解除超时锁存 */
+    t->is_timeout = false; /* 收到一次成功数据，解除超时锁存 */
 
 #if MICROCOM_FASTMODE_ENABLE == 0
     t->is_trigger = true;
@@ -423,7 +423,7 @@ void MicroCom_Lin_RxError(uint8_t channel, uint8_t id)
         return;
     }
 
-    lin_ptr->busy[channel]       = false;
+    lin_ptr->busy[channel] = false;
     lin_ptr->active_idx[channel] = MICROCOM_LIN_IDX_INVALID;
 
     /* 不触发任何用户事件：next_time 已经在 Dispatch 时推进过，下个周期
