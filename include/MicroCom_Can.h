@@ -2,7 +2,7 @@
  * @file MicroCom_Can.h
  * @author https://xfp23.github.io/
  * @brief Public interface for the MicroCom CAN message scheduling module.
- * @version 0.1
+ * @version \ref MICROCOM_VERSION
  * @date 2026-09-09
  *
  * @copyright Copyright (c) 2026
@@ -12,7 +12,7 @@
 #ifndef MICROCOM_CAN_H
 #define MICROCOM_CAN_H
 
-#include "MicroCom_types.h"
+#include "MicroCom_Can_types.h"
 
 #ifdef __cplusplus
 extern "C"

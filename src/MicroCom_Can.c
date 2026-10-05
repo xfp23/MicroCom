@@ -2,7 +2,7 @@
  * @file MicroCom_Can.c
  * @author https://xfp23.github.io/
  * @brief Implementation of MicroCom's CAN module
- * @version 0.1
+ * @version \ref MICROCOM_VERSION
  * @date 2026-09-08
  *
  * @copyright Copyright (c) 2026
@@ -14,11 +14,11 @@
 
 static MicroCOM_CAN_Obj_t can_obj = {0};
 
-static inline void MicroCom_Can_Invoke(MicroCom_Func_t func, void *userData, uint8_t channel, uint32_t id, MicroCom_Event_t event, uint16_t mboxId, bool is_extend, uint8_t *data, uint8_t len)
+static inline void MicroCom_Can_Invoke(MicroCom_Can_Func_t func, void *userData, uint8_t channel, uint32_t id, MicroCom_Can_Event_t event, uint16_t mboxId, bool is_extend, uint8_t *data, uint8_t len)
 {
     if (func != NULL)
     {
-        MicroCom_Ctx_t ctx;
+        MicroCom_Can_Ctx_t ctx;
         ctx.event = event;
         ctx.channel = channel;
         ctx.id = id;
@@ -313,11 +313,11 @@ void MicroCom_Can_TimerHandler(void)
                 if (MicroCom_Can_Transmit(ch, tx->id, tx->mbox_id, tx->dlc, tx->data, tx->is_Extend) == MICROCOM_STATUS_OK)
                 {
                     tx->is_txing = true;
-                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_CYCLE_TX, tx->mbox_id, tx->is_Extend, tx->data, tx->dlc);
+                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_CAN_EVENT_CYCLE_TX, tx->mbox_id, tx->is_Extend, tx->data, tx->dlc);
                 }
                 else
                 {
-                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_CYCLE_TX_ERROR, tx->mbox_id, tx->is_Extend, tx->data, tx->dlc);
+                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_CAN_EVENT_CYCLE_TX_ERROR, tx->mbox_id, tx->is_Extend, tx->data, tx->dlc);
                 }
             }
         }
@@ -330,14 +330,14 @@ void MicroCom_Can_TimerHandler(void)
             if (rx->is_run && !rx->is_offline && (now - rx->last_rx_time >= rx->timeout))
             {
                 rx->is_offline = true;
-                MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_EVENT_CYCLE_RX_ERROR, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
+                MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_CAN_EVENT_CYCLE_RX_ERROR, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
             }
 
 #if MICROCOM_FASTMODE_ENABLE == 0
             if (rx->is_run && rx->is_trigger)
             {
                 rx->is_trigger = false;
-                MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_EVENT_CYCLE_RX, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
+                MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_CAN_EVENT_CYCLE_RX, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
             }
 #endif
         }
@@ -353,11 +353,11 @@ void MicroCom_Can_TimerHandler(void)
                 {
                     tx->is_txing = true;
                     tx->trigger = false;
-                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_EVENT_TX, tx->mbox_id, tx->is_Extend, tx->data, tx->len);
+                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_CAN_EVENT_EVENT_TX, tx->mbox_id, tx->is_Extend, tx->data, tx->len);
                 }
                 else
                 {
-                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_EVENT_EVENT_TX_ERROR, tx->mbox_id, tx->is_Extend, tx->data, tx->len);
+                    MicroCom_Can_Invoke(tx->func, tx->userData, ch, tx->id, MICROCOM_CAN_EVENT_EVENT_TX_ERROR, tx->mbox_id, tx->is_Extend, tx->data, tx->len);
                 }
             }
         }
@@ -370,7 +370,7 @@ void MicroCom_Can_TimerHandler(void)
             if (rx->is_run && rx->is_trigger)
             {
                 rx->is_trigger = false;
-                MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_EVENT_EVENT_RX, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
+                MicroCom_Can_Invoke(rx->func, rx->userData, ch, rx->id, MICROCOM_CAN_EVENT_EVENT_RX, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
             }
         }
 #endif
@@ -415,7 +415,7 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bo
 #if MICROCOM_FASTMODE_ENABLE == 0
         rx->is_trigger = true;
 #else
-        MicroCom_Can_Invoke(rx->func, rx->userData, rx->channel, rx->id, MICROCOM_EVENT_CYCLE_RX, rx->mbox_id, rx->is_Extend, rx->data, rx->len); // 快速模式下直接回调，不等timerhandler
+        MicroCom_Can_Invoke(rx->func, rx->userData, rx->channel, rx->id, MICROCOM_CAN_EVENT_CYCLE_RX, rx->mbox_id, rx->is_Extend, rx->data, rx->len); // 快速模式下直接回调，不等timerhandler
 #endif
 
         return MICROCOM_STATUS_OK;
@@ -440,7 +440,7 @@ MicroCom_Status_t MicroCom_Can_RxIndication(uint8_t channel, uint32_t can_id, bo
 #if MICROCOM_FASTMODE_ENABLE == 0
         rx->is_trigger = true;
 #else
-        MicroCom_Can_Invoke(rx->func, rx->userData, rx->channel, rx->id, MICROCOM_EVENT_EVENT_RX, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
+        MicroCom_Can_Invoke(rx->func, rx->userData, rx->channel, rx->id, MICROCOM_CAN_EVENT_EVENT_RX, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
 #endif
 
         return MICROCOM_STATUS_OK;
@@ -500,7 +500,7 @@ MicroCom_Status_t MicroCom_Can_SetEventOffline(uint32_t id, uint8_t channel)
         if (rx->id == id)
         {
             rx->is_offline = true;
-            MicroCom_Can_Invoke(rx->func, rx->userData, channel, id, MICROCOM_EVENT_EVENT_RX_ERROR, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
+            MicroCom_Can_Invoke(rx->func, rx->userData, channel, id, MICROCOM_CAN_EVENT_EVENT_RX_ERROR, rx->mbox_id, rx->is_Extend, rx->data, rx->len);
             return MICROCOM_STATUS_OK;
         }
     }
@@ -668,7 +668,7 @@ MicroCom_Status_t MicroCom_Can_HwTxDone(uint8_t channel, uint16_t mboxId)
         if (tx->mbox_id == mboxId && tx->is_txing)
         {
             tx->is_txing = false;
-            MicroCom_Can_Invoke(tx->func, tx->userData, tx->channel, tx->id, MICROCOM_EVENT_CYCLE_TX_DONE, tx->mbox_id, tx->is_Extend, tx->data, tx->dlc);
+            MicroCom_Can_Invoke(tx->func, tx->userData, tx->channel, tx->id, MICROCOM_CAN_EVENT_CYCLE_TX_DONE, tx->mbox_id, tx->is_Extend, tx->data, tx->dlc);
             return MICROCOM_STATUS_OK;
         }
     }
@@ -681,7 +681,7 @@ MicroCom_Status_t MicroCom_Can_HwTxDone(uint8_t channel, uint16_t mboxId)
         if (tx->mbox_id == mboxId && tx->is_txing)
         {
             tx->is_txing = false;
-            MicroCom_Can_Invoke(tx->func, tx->userData, tx->channel, tx->id, MICROCOM_EVENT_EVENT_TX_DONE, tx->mbox_id, tx->is_Extend, tx->data, tx->len);
+            MicroCom_Can_Invoke(tx->func, tx->userData, tx->channel, tx->id, MICROCOM_CAN_EVENT_EVENT_TX_DONE, tx->mbox_id, tx->is_Extend, tx->data, tx->len);
             return MICROCOM_STATUS_OK;
         }
     }

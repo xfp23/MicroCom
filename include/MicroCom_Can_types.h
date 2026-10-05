@@ -2,13 +2,13 @@
  * @file MicroCom_types.h
  * @author https://xfp23.github.io/
  * @brief
- * @version 0.2 (重构：TX/RX 分表，去除 dir 维度)
+ * @version \ref MICROCOM_VERSION
  * @date 2026-09-08
  *
  * @copyright Copyright (c) 2026
  */
-#ifndef MICROCOM_TYPES_H
-#define MICROCOM_TYPES_H
+#ifndef MICROCOM_CAN_TYPES_H
+#define MICROCOM_CAN_TYPES_H
 
 #include "MicroCom_conf.h"
 #include "MicroCom_utils.h"
@@ -30,7 +30,7 @@ typedef enum
     MICROCOM_STATUS_OK,
     MICROCOM_STATUS_ERR,
     MICROCOM_STATUS_BUSY,
-    MICROCOM_PARAM_INVALID,  /* 参数非法 */
+    MICROCOM_PARAM_INVALID, /* 参数非法 */
     MICROCOM_CHANNEL_ERR,
     MICROCOM_NOT_FIND,
     MICROCOM_CHANNEL_OVERFLOW, // 通道溢出
@@ -39,22 +39,22 @@ typedef enum
 
 typedef enum
 {
-    MICROCOM_EVENT_CYCLE_TX,
-    MICROCOM_EVENT_EVENT_TX,
+    MICROCOM_CAN_EVENT_CYCLE_TX,
+    MICROCOM_CAN_EVENT_EVENT_TX,
 
-    MICROCOM_EVENT_CYCLE_RX,
-    MICROCOM_EVENT_EVENT_RX,
+    MICROCOM_CAN_EVENT_CYCLE_RX,
+    MICROCOM_CAN_EVENT_EVENT_RX,
 
-    MICROCOM_EVENT_CYCLE_TX_DONE,
-    MICROCOM_EVENT_EVENT_TX_DONE,
+    MICROCOM_CAN_EVENT_CYCLE_TX_DONE,
+    MICROCOM_CAN_EVENT_EVENT_TX_DONE,
 
-    MICROCOM_EVENT_CYCLE_TX_ERROR,
-    MICROCOM_EVENT_EVENT_TX_ERROR,
+    MICROCOM_CAN_EVENT_CYCLE_TX_ERROR,
+    MICROCOM_CAN_EVENT_EVENT_TX_ERROR,
 
-    MICROCOM_EVENT_CYCLE_RX_ERROR,
-    MICROCOM_EVENT_EVENT_RX_ERROR,
+    MICROCOM_CAN_EVENT_CYCLE_RX_ERROR,
+    MICROCOM_CAN_EVENT_EVENT_RX_ERROR,
 
-} MicroCom_Event_t;
+} MicroCom_Can_Event_t;
 
 /**
  * @brief 报文回调上下文
@@ -64,17 +64,17 @@ typedef enum
  */
 typedef struct
 {
-    MicroCom_Event_t event;
-    uint8_t          channel;
-    uint16_t          mboxId; 
-    bool             is_extend;
-    uint32_t         id;
-    uint8_t         *data;
-    uint8_t          len;
-    void            *userData;
-} MicroCom_Ctx_t;
+    MicroCom_Can_Event_t event;
+    uint8_t channel;
+    uint16_t mboxId;
+    bool is_extend;
+    uint32_t id;
+    uint8_t *data;
+    uint8_t len;
+    void *userData;
+} MicroCom_Can_Ctx_t;
 
-typedef void (*MicroCom_Func_t)(MicroCom_Ctx_t *ctx);
+typedef void (*MicroCom_Can_Func_t)(MicroCom_Can_Ctx_t *ctx);
 
 /* ------------------------------------------------------------------------ */
 /* 周期性发送报文（TX）                                                      */
@@ -83,43 +83,41 @@ typedef struct
 {
     /* --- 配置字段：由 Register 接口写入 --- */
     uint32_t id;
-    bool     is_Extend;      /* 是否扩展帧 */
-    uint8_t  dlc;            /* 报文长度，<= MICROCOM_CAN_MAX_DLC */
-    uint16_t mbox_id;        /* 报文邮箱号 */
-    uint8_t  channel;        /* 通道 */
-    bool     is_diag;        /* 是否诊断通信 */
-    uint32_t cycle;          /* 发送周期（单位：tick） */
+    bool is_Extend;   /* 是否扩展帧 */
+    uint8_t dlc;      /* 报文长度，<= MICROCOM_CAN_MAX_DLC */
+    uint16_t mbox_id; /* 报文邮箱号 */
+    uint8_t channel;  /* 通道 */
+    bool is_diag;     /* 是否诊断通信 */
+    uint32_t cycle;   /* 发送周期（单位：tick） */
 
-    uint8_t *data;           /* 用户管理的数据缓冲区，长度需 >= dlc */
-    void    *userData;       /* 回调用户数据 */
-    MicroCom_Func_t func;    /* 每次发送后的回调，可为 NULL */
+    uint8_t *data;            /* 用户管理的数据缓冲区，长度需 >= dlc */
+    void *userData;           /* 回调用户数据 */
+    MicroCom_Can_Func_t func; /* 每次发送后的回调，可为 NULL */
 
     /* --- 运行时字段：内部维护，注册时会被强制初始化，用户无需填写 --- */
-    volatile bool     is_run;    /* 是否参与调度 */
+    volatile bool is_run;        /* 是否参与调度 */
     volatile uint32_t next_time; /* 下一次应发送的 tick（内部用，避免周期漂移） */
 
     volatile bool is_txing; // 是否正在发送
 
-    bool is_valid;           // 有效
+    bool is_valid; // 有效
 } MicroCom_CanCycleTxMsg_t;
 
-typedef struct 
+typedef struct
 {
     uint32_t id;
-    bool     is_Extend;      /* 是否扩展帧 */
-    uint8_t  dlc;            /* 报文长度，<= MICROCOM_CAN_MAX_DLC */
-    uint16_t mbox_id;        /* 报文邮箱号 */
-    uint8_t  channel;        /* 通道 */
-    bool     is_diag;        /* 是否诊断通信 */
-    uint32_t cycle;          /* 发送周期（单位：tick） */
+    bool is_Extend;   /* 是否扩展帧 */
+    uint8_t dlc;      /* 报文长度，<= MICROCOM_CAN_MAX_DLC */
+    uint16_t mbox_id; /* 报文邮箱号 */
+    uint8_t channel;  /* 通道 */
+    bool is_diag;     /* 是否诊断通信 */
+    uint32_t cycle;   /* 发送周期（单位：tick） */
 
-    uint8_t *data;           /* 用户管理的数据缓冲区，长度需 >= dlc */
-    void    *userData;       /* 回调用户数据 */
-    MicroCom_Func_t func;    /* 每次发送后的回调，可为 NULL */
-
+    uint8_t *data;            /* 用户管理的数据缓冲区，长度需 >= dlc */
+    void *userData;           /* 回调用户数据 */
+    MicroCom_Can_Func_t func; /* 每次发送后的回调，可为 NULL */
 
 } MicroCom_CanCycleTx_ConfigTable_t;
-
 
 /* ------------------------------------------------------------------------ */
 /* 周期性接收报文（RX，带超时监控）                                          */
@@ -127,44 +125,43 @@ typedef struct
 typedef struct
 {
     uint32_t id;
-    bool     is_Extend;
-    uint8_t  dlc;
+    bool is_Extend;
+    uint8_t dlc;
     uint16_t mbox_id;
-    uint8_t  channel;
-    bool     is_diag;
-    uint32_t timeout;        /* 接收超时（单位：tick） */
+    uint8_t channel;
+    bool is_diag;
+    uint32_t timeout; /* 接收超时（单位：tick） */
 
     uint8_t *data;
-    void    *userData;
-    MicroCom_Func_t func;    /* 收到报文 / 超时 均会回调，通过 ctx.event 区分 */
+    void *userData;
+    MicroCom_Can_Func_t func; /* 收到报文 / 超时 均会回调，通过 ctx.event 区分 */
 
-    volatile bool     is_run;
+    volatile bool is_run;
     // volatile bool     busoff;      /* true 表示超时 / 总线错误 */
-    volatile bool     is_offline; // 离线超时
-    volatile uint32_t last_rx_time;/* 最近一次收到报文（或重置）时的 tick */
+    volatile bool is_offline;       // 离线超时
+    volatile uint32_t last_rx_time; /* 最近一次收到报文（或重置）时的 tick */
 
     volatile bool is_trigger; // 触发回调
 
-    bool is_valid;           // 有效
-    uint8_t len; // 长度
+    bool is_valid; // 有效
+    uint8_t len;   // 长度
 } MicroCom_CanCycleRxMsg_t;
 
-typedef struct 
+typedef struct
 {
     uint32_t id;
-    bool     is_Extend;
-    uint8_t  dlc;
+    bool is_Extend;
+    uint8_t dlc;
     uint16_t mbox_id;
-    uint8_t  channel;
-    bool     is_diag;
-    uint32_t timeout;        /* 接收超时（单位：tick） */
+    uint8_t channel;
+    bool is_diag;
+    uint32_t timeout; /* 接收超时（单位：tick） */
 
     uint8_t *data;
-    void    *userData;
-    MicroCom_Func_t func;    /* 收到报文 / 超时 均会回调，通过 ctx.event 区分 */
+    void *userData;
+    MicroCom_Can_Func_t func; /* 收到报文 / 超时 均会回调，通过 ctx.event 区分 */
 
-
-}MicroCom_CanCycleRx_ConfigTable_t;
+} MicroCom_CanCycleRx_ConfigTable_t;
 
 /* ------------------------------------------------------------------------ */
 /* 事件触发发送报文（TX）                                                    */
@@ -172,36 +169,36 @@ typedef struct
 typedef struct
 {
     uint32_t id;
-    bool     is_Extend;
+    bool is_Extend;
     uint16_t mbox_id;
-    uint8_t  channel;
-    uint8_t  dlc;
-    bool     is_diag;
-    
-    void    *userData;
-    MicroCom_Func_t func;
+    uint8_t channel;
+    uint8_t dlc;
+    bool is_diag;
 
-    volatile bool     is_run;
-    volatile bool trigger; 
-    
+    void *userData;
+    MicroCom_Can_Func_t func;
+
+    volatile bool is_run;
+    volatile bool trigger;
+
     volatile bool is_txing; // 正在发送?
-    bool is_valid;           // 有效
+    bool is_valid;          // 有效
 
-    uint8_t  len;
+    uint8_t len;
     uint8_t data[MICROCOM_CAN_MAX_DLC];
 } MicroCom_CanEventTxMsg_t;
 
 typedef struct
 {
     uint32_t id;
-    bool     is_Extend;
+    bool is_Extend;
     uint16_t mbox_id;
-    uint8_t  channel;
-    uint8_t  dlc;
-    bool     is_diag;
-    
-    void    *userData;
-    MicroCom_Func_t func;
+    uint8_t channel;
+    uint8_t dlc;
+    bool is_diag;
+
+    void *userData;
+    MicroCom_Can_Func_t func;
 
 } MicroCom_CanEventTx_ConfigTable_t;
 
@@ -211,21 +208,21 @@ typedef struct
 typedef struct
 {
     uint32_t id;
-    bool     is_Extend;
-    uint8_t  dlc;
+    bool is_Extend;
+    uint8_t dlc;
     uint16_t mbox_id;
-    uint8_t  channel;
-    bool     is_diag;
+    uint8_t channel;
+    bool is_diag;
 
-    void    *userData;
-    MicroCom_Func_t func;
+    void *userData;
+    MicroCom_Can_Func_t func;
 
     volatile bool is_trigger; // 触发回调
-    
-    volatile bool is_run;
-    volatile bool is_offline;   /* 事件报文无自动超时机制，由 Set/ClearEventBusOff 管理 */
 
-    bool is_valid;           // 有效
+    volatile bool is_run;
+    volatile bool is_offline; /* 事件报文无自动超时机制，由 Set/ClearEventBusOff 管理 */
+
+    bool is_valid; // 有效
 
     uint8_t data[MICROCOM_CAN_MAX_DLC];
     uint8_t len;
@@ -241,7 +238,7 @@ typedef struct
     bool is_diag;
 
     void *userData;
-    MicroCom_Func_t func;
+    MicroCom_Can_Func_t func;
 } MicroCom_CanEventRx_ConfigTable_t;
 
 /* ------------------------------------------------------------------------ */
@@ -264,7 +261,7 @@ typedef struct
 #if MICROCOM_CAN_EVENTMSG_ENABLE
     uint32_t e_tx_num[MICROCOM_CAN_CHANNEL_NUM];
     uint32_t e_rx_num[MICROCOM_CAN_CHANNEL_NUM];
-#endif 
+#endif
 } MicroCOM_CAN_Obj_t;
 
 #ifdef __cplusplus

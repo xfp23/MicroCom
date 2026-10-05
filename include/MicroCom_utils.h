@@ -1,14 +1,14 @@
 /**
  * @file MicroCom_utils.h
  * @brief 参数校验宏。全部要求调用处函数返回类型为 MicroCom_Status_t。
- *
+ * @version \ref MICROCOM_VERSION
  * @copyright Copyright (c) 2026
  */
 #ifndef MICROCOM_UTILS_H
 #define MICROCOM_UTILS_H
 
 #include "MicroCom_conf.h"
-#include "MicroCom_types.h"
+#include "MicroCom_Can_types.h"
 #include "stddef.h"
 
 #ifdef __cplusplus
