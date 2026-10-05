@@ -1,6 +1,6 @@
 # MicroCom — CAN / LIN Message Scheduling
 
-[中文](./README_CN.md)
+[中文](./readme.zh.md)
 
 MicroCom is a lightweight static message scheduling component for embedded
 MCUs, primarily targeting Cortex-M based systems.
@@ -996,4 +996,4 @@ This keeps the runtime scheduler simple and deterministic.
 
 Copyright (c) 2026.
 
-See the project license for details.
+[LICENSE](./LICENSE)

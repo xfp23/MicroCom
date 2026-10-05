@@ -1,6 +1,6 @@
 # MicroCom — CAN / LIN 消息调度
 
-[English](./README.md)
+[English](./readme.md)
 
 MicroCom 是一个面向嵌入式 MCU 的轻量级静态消息调度组件，主要针对基于 Cortex-M 的系统。
 
@@ -962,8 +962,8 @@ MicroCom 决定消息**何时**应该发送或处理。
 
 ---
 
-# License
+# 许可证
 
 Copyright (c) 2026.
 
-详细信息请参阅项目许可证。
+[许可证](./LICENSE)
