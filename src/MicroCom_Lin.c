@@ -12,10 +12,6 @@
 
 #if MICROCOM_LIN_ENABLE
 
-/* ========================================================================= */
-/* 运行时对象                                                                */
-/* ========================================================================= */
-
 static MicroCom_Lin_Obj_t lin_obj = {0};
 
 /* 尽量用指针，为以后 MicroMem 打基础 */
@@ -39,14 +35,6 @@ static inline void MicroCom_Lin_Invoke(MicroCom_Lin_Table_t *t, MicroCom_Lin_Eve
         t->callback(&ctx);
     }
 }
-
-/* ========================================================================= */
-/* 向下：弱默认实现                                                          */
-/*                                                                          */
-/* 没有挂真正的驱动时统一返回 false——绝不能默认返回 true，否则调度层         */
-/* 会以为提交成功、把通道置 busy，然后永远等不到 TxDone/RxIndication，        */
-/* 这个通道就死锁了。                                                       */
-/* ========================================================================= */
 
 MicroCom_Status_t __attribute__((weak)) MicroCom_Lin_Transmit(uint8_t channel, uint8_t id, const uint8_t *data, uint8_t len)
 {
@@ -133,7 +121,6 @@ MicroCom_Status_t MicroCom_Lin_RegisterTable(const MicroCom_Lin_ConfigTable_t *t
         return MICROCOM_PARAM_INVALID;
     }
 
-    /* ---- 第一趟：只校验，不写入 lin_obj，保证失败时状态完全不变 ---- */
     uint32_t count[MICROCOM_LIN_CHANNEL_NUM] = {0};
 
     for (size_t i = 0u; i < size; i++)
@@ -165,7 +152,6 @@ MicroCom_Status_t MicroCom_Lin_RegisterTable(const MicroCom_Lin_ConfigTable_t *t
         count[table[i].channel]++;
     }
 
-    /* ---- 第二趟：校验已全部通过，安心写入 ---- */
     uint32_t index[MICROCOM_LIN_CHANNEL_NUM] = {0};
 
     for (size_t i = 0u; i < size; i++)
@@ -201,9 +187,6 @@ MicroCom_Status_t MicroCom_Lin_RegisterTable(const MicroCom_Lin_ConfigTable_t *t
     return MICROCOM_STATUS_OK;
 }
 
-/* ========================================================================= */
-/* Tick                                                                       */
-/* ========================================================================= */
 
 void MicroCom_Lin_TickHandler(void)
 {
@@ -213,9 +196,6 @@ void MicroCom_Lin_TickHandler(void)
     }
 }
 
-/* ========================================================================= */
-/* 调度：每通道找下一条到点的报文，发起一次传输                              */
-/* ========================================================================= */
 
 static void MicroCom_Lin_DispatchChannel(uint8_t ch, uint32_t now)
 {
@@ -226,8 +206,6 @@ static void MicroCom_Lin_DispatchChannel(uint8_t ch, uint32_t now)
         return;
     }
 
-    /* 从轮询游标开始扫一整圈，找第一条到点的；用游标而不是每次都从 0
-     * 开始，避免某条短周期报文把同通道里排在后面的报文长期饿死。 */
     for (uint32_t step = 0u; step < count; step++)
     {
         uint8_t idx = (uint8_t)((lin_ptr->scan_cursor[ch] + step) % count);
@@ -243,16 +221,14 @@ static void MicroCom_Lin_DispatchChannel(uint8_t ch, uint32_t now)
             continue; /* 还没到点 */
         }
 
-        /* 到点了：不管这次提交成功与否，都先推进 next_time，
-         * 避免提交失败时下一轮又立刻重复判定"到点"，导致疯狂重试。 */
         t->next_time += t->cycle;
         lin_ptr->scan_cursor[ch] = (uint8_t)((idx + 1u) % count);
 
         if (t->dir == MICROCOM_DIR_TX)
         {
-            bool ok = MicroCom_Lin_Transmit(ch, t->id, t->data, t->length);
+            MicroCom_Status_t ret = MicroCom_Lin_Transmit(ch, t->id, t->data, t->length);
 
-            if (ok)
+            if (ret == MICROCOM_STATUS_OK)
             {
                 lin_ptr->busy[ch] = true;
                 lin_ptr->active_idx[ch] = idx;
@@ -265,9 +241,9 @@ static void MicroCom_Lin_DispatchChannel(uint8_t ch, uint32_t now)
         }
         else /* MICROCOM_DIR_RX */
         {
-            bool ok = MicroCom_Lin_Receive(ch, t->id, t->length);
+            MicroCom_Status_t ret = MicroCom_Lin_Receive(ch, t->id, t->length);
 
-            if (ok)
+            if (ret == MICROCOM_STATUS_OK)
             {
                 lin_ptr->busy[ch] = true;
                 lin_ptr->active_idx[ch] = idx;
@@ -281,9 +257,6 @@ static void MicroCom_Lin_DispatchChannel(uint8_t ch, uint32_t now)
     }
 }
 
-/* ========================================================================= */
-/* RX 超时检查：和 MicroCom_Can 的 CycleRx 超时模型完全一致                 */
-/* ========================================================================= */
 
 static void MicroCom_Lin_CheckTimeout(uint8_t ch, uint32_t now)
 {
@@ -431,4 +404,23 @@ void MicroCom_Lin_RxError(uint8_t channel, uint8_t id)
      * 按用户配置的 timeout 周期性判断，不在这里直接对用户的单次失败
      * 做反应——这正是老代码"连续多次收不到才算丢失"想做但没做对的事。 */
 }
+
+bool MicroCom_Lin_IsRxOffline(uint8_t channel, uint8_t id)
+{
+    if(channel >= MICROCOM_LIN_CHANNEL_NUM)
+    {
+        return false;
+    }
+
+    for(uint32_t i = 0; i < lin_ptr->msg_num[channel]; i++)
+    {
+        if(lin_ptr->table[channel][i].dir == MICROCOM_DIR_RX && lin_ptr->table[channel][i].id == id)
+        {
+            return lin_ptr->table[channel][i].is_timeout;
+        }
+    }
+
+    return false;
+}
+
 #endif

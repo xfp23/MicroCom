@@ -220,6 +220,17 @@ extern void MicroCom_Lin_RxIndication(uint8_t channel, uint8_t id, const uint8_t
  */
 extern void MicroCom_Lin_RxError(uint8_t channel, uint8_t id);
 
+/**
+ * @brief Check the frame is offline
+ * 
+ * @param channel Logical LIN channel number.
+ * @param id 6-bit LIN frame identifier associated with the received
+ *                response.
+ * @return true 
+ * @return false 
+ */
+extern bool MicroCom_Lin_IsRxOffline(uint8_t channel, uint8_t id);
+
 #endif
 
 #ifdef __cplusplus
